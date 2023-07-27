@@ -1,6 +1,9 @@
 open! Core
 module Gp = Gnuplot
 
+let coin_name = "Bitcoin"
+let sample_list = [ 1.0, 2.0 ]
+
 let visualize_command =
   let open Command.Let_syntax in
   Command.basic
@@ -8,15 +11,16 @@ let visualize_command =
     (let%map_open () = return () in
      fun () ->
        let gp = Gp.create () in
-       Gp.plot_many
+       Gp.plot
          gp
-         ~range:(Gp.XY (-10., 10., -1.5, 1.5))
-         ~output:(Gp.Output.create (`Png "test_output.png"))
-         [ Gp.Series.lines_func "sin(x)" ~title:"Plot a line" ~color:`Blue
-         ; Gp.Series.points_func "cos(x)" ~title:"Plot points" ~color:`Green
-         ];
+         ~output:(Gp.Output.create (`Png (coin_name ^ ".png")))
+         ~title:(coin_name ^ " Prediction Model")
+         ~use_grid:true
+         ~fill:(`Pattern 1)
+         ~range:(Gp.XY (0.0, 360.0, 0.0, 23000.0))
+         ~labels:(Gp.Labels.create ~x:"Dates" ~y:"Prices" ())
+         ~format:"%b %d'%y"
+         (Gnuplot.Series.lines_datey sample_list);
        Gp.close gp;
-       (* ignore (input_file : File_path.t); ignore (output_file :
-          File_path.t); *)
-       printf !"Done! Wrote dot file to %s!" "test_output.png")
+       printf !"Done! Wrote gnufile to %s!" "test_output.png")
 ;;
