@@ -1,5 +1,5 @@
 (library
  (name crypto_src)
- (libraries core curl file_path)
+ (libraries core curl file_path gnuplot)
  (preprocess
   (pps ppx_jane)))
