@@ -1,4 +1,6 @@
 (executable
  (public_name jsipcrypto)
  (name main)
- (libraries jsipcrypto))
+ (libraries core crypto_src)
+ (preprocess
+  (pps ppx_jane)))
