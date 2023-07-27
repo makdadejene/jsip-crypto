@@ -14,9 +14,9 @@ module Crypto = struct
 
   let get_data_file t =
     match t with
-    | Bitcoin -> "src/bitcoin_data.txt"
-    | Ethereum -> "src/ethereum_data.txt"
-    | XRP -> "src/xrp_data.txt"
+    | Bitcoin -> "src/data/bitcoin_data.txt"
+    | Ethereum -> "src/data/ethereum_data.txt"
+    | XRP -> "src/data/xrp_data.txt"
   ;;
 end
 
