@@ -14,9 +14,9 @@ module Crypto = struct
 
   let get_data_file t =
     match t with
-    | Bitcoin -> "src/data/bitcoin_data.txt"
-    | Ethereum -> "src/data/ethereum_data.txt"
-    | XRP -> "src/data/xrp_data.txt"
+    | Bitcoin -> "data/bitcoin_data.txt"
+    | Ethereum -> "data/ethereum_data.txt"
+    | XRP -> "data/xrp_data.txt"
   ;;
 end
 
@@ -114,7 +114,8 @@ module Total_Data = struct
     [@@deriving compare, sexp]
 
     let create crypto = { crypto; days = [] }
-    let add_day_data t day = t.days <- t.days @ [ day ]
+    let add_day_data t day = t.days <- t.days @ [day]
+    let add_days_data t days =  t.days <- t.days @ days
   end
 
   include T

@@ -1,6 +1,7 @@
 (library
  (name crypto_src)
  (libraries core curl file_path gnuplot)
- (inline_tests)
+ (inline_tests
+  (deps ./data/bitcoin_data.txt))
  (preprocess
   (pps ppx_jane)))
