@@ -5,6 +5,7 @@ module Crypto : sig
     | Bitcoin
     | Ethereum
     | XRP
+  [@@deriving compare, sexp_of]
 
   val get_data_file : t -> string
 end
@@ -15,6 +16,7 @@ module Date : sig
     ; month : int
     ; day : int
     }
+  [@@deriving compare, sexp_of]
 
   val create : string -> t
 end
@@ -28,6 +30,7 @@ module Day_Data : sig
     ; close : float
     ; volume : int
     }
+  [@@deriving compare, sexp_of]
 
   val create
     :  date:string

@@ -20,12 +20,6 @@ module Crypto = struct
   ;;
 end
 
-(* module Day = struct module T = struct type t = { price : Price.t ; time :
-   Time.t ; volume : Volume.t ; low : Low.t ; high : High.t ; market_cap :
-   Market.t } [@@deriving compare, sexp] end
-
-   include T include Comparable.Make (T) end *)
-
 module Date = struct
   module T = struct
     type t =
@@ -114,8 +108,8 @@ module Total_Data = struct
     [@@deriving compare, sexp]
 
     let create crypto = { crypto; days = [] }
-    let add_day_data t day = t.days <- t.days @ [day]
-    let add_days_data t days =  t.days <- t.days @ days
+    let add_day_data t day = t.days <- t.days @ [ day ]
+    let add_days_data t days = t.days <- t.days @ days
   end
 
   include T
@@ -139,9 +133,7 @@ let%expect_test "next_date2" =
 ;;
 
 let%expect_test "next_date3" =
-  let next_date =
-    Date.next_date { Date.year = 1900; month = 2; day = 28 }
-  in
+  let next_date = Date.next_date { Date.year = 1900; month = 2; day = 28 } in
   print_s [%message (next_date : Date.t)];
   [%expect {| (next_date ((year 1900) (month 3) (day 1))) |}]
 ;;
