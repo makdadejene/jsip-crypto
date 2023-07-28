@@ -22,10 +22,7 @@ let get_moving_avgs (crypto_data : Types.Total_Data.t) (range : int) =
     if index_orig >= range - 1
     then (
       let curr_range =
-        List.filteri close_list ~f:(fun index_rg _float ->
-          if index_rg >= index_orig - (range - 1) && index_rg <= index_orig
-          then true
-          else false)
+        List.slice close_list (index_orig - (range - 1)) index_orig
       in
       let sum = List.fold curr_range ~init:0.0 ~f:(fun sum x -> sum +. x) in
       result @ [ sum /. Int.to_float range ])
