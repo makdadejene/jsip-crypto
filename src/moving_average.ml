@@ -32,7 +32,7 @@ let get_moving_avgs (crypto_data : Types.Total_Data.t) (range : int) =
     else [])
 ;;
 
-let%expect_test "mvg" =
+let%expect_test "mvg_test1" =
   let total_data = Types.Total_Data.create Types.Crypto.Bitcoin in
   let days =
     List.init 10 ~f:(fun int ->
@@ -48,4 +48,51 @@ let%expect_test "mvg" =
   let moving_average_test = get_moving_avgs total_data 2 in
   print_s [%message (moving_average_test : float list)];
   [%expect {|(moving_average_test (0.5 1.5 2.5 3.5 4.5 5.5 6.5 7.5 8.5))|}]
+;;
+
+let%expect_test "mvg_test2" =
+  let total_data = Types.Total_Data.create Types.Crypto.Bitcoin in
+  let day1 =
+    Types.Day_Data.create
+      ~date:"2022-07-29"
+      ~open_:0.
+      ~high:0.
+      ~low:0.
+      ~close:1.5
+      ~volume:0
+  in
+  let day2 =
+    Types.Day_Data.create
+      ~date:"2022-07-30"
+      ~open_:0.
+      ~high:0.
+      ~low:0.
+      ~close:2.45
+      ~volume:0
+  in
+  let day3 =
+    Types.Day_Data.create
+      ~date:"2022-07-30"
+      ~open_:0.
+      ~high:0.
+      ~low:0.
+      ~close:3.23
+      ~volume:0
+  in
+  let day4 =
+    Types.Day_Data.create
+      ~date:"2022-07-31"
+      ~open_:0.
+      ~high:0.
+      ~low:0.
+      ~close:4.87
+      ~volume:0
+  in
+  Types.Total_Data.add_day_data total_data day1;
+  Types.Total_Data.add_day_data total_data day2;
+  Types.Total_Data.add_day_data total_data day3;
+  Types.Total_Data.add_day_data total_data day4;
+  let moving_average_test = get_moving_avgs total_data 2 in
+  print_s [%message (moving_average_test : float list)];
+  [%expect {|(moving_average_test (1.975 2.84 4.05))|}]
 ;;
