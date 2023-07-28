@@ -1,8 +1,5 @@
-open Core
+open! Core
 
 module AutoRegressor = struct
-  type t = {
-    
-  }
-
+  type t = End
 end
