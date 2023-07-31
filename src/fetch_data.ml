@@ -9,11 +9,9 @@ let get_minute_data coin =
     let curr_list = List.tl_exn split_line in
     match curr_list with
     | time :: _filler :: price :: _ ->
-      if not (String.equal price "null")
-      then (
-        let price = Float.of_string price in
-        let day = Types.Minute_Data.create ~time ~price in
-        Types.Total_Minute_Data.add_day_data total_data day)
+      let price = Float.of_string price in
+      let day = Types.Minute_Data.create ~time ~price in
+      Types.Total_Minute_Data.add_day_data total_data day
     | _ -> ());
   total_data
 ;;
