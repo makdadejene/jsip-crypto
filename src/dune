@@ -1,6 +1,6 @@
 (library
  (name crypto_src)
- (libraries core curl file_path gnuplot)
+ (libraries core curl file_path gnuplot owl-base)
  (inline_tests
   (deps ./data/bitcoin_data.txt))
  (preprocess
