@@ -14,10 +14,78 @@ module Crypto = struct
 
   let get_data_file t =
     match t with
-    | Bitcoin -> "data/bitcoin_data.txt"
+    | Bitcoin -> "src/data/bitcoin_test.txt"
     | Ethereum -> "data/ethereum_data.txt"
     | XRP -> "data/xrp_data.txt"
   ;;
+end
+
+module Time = struct
+  module T = struct
+    type t =
+      { year : int
+      ; month : int
+      ; day : int
+      ; hour : int
+      ; minute : int
+      }
+    [@@deriving compare, sexp]
+  end
+
+  include T
+  include Comparable.Make (T)
+
+  let create minute_string =
+    let time_list = String.split minute_string ~on:' ' in
+    let total_dates = List.hd_exn time_list in
+    let seperate_dates = String.split total_dates ~on:'-' in
+    let year, month, day =
+      ( Int.of_string (List.nth_exn seperate_dates 0)
+      , Int.of_string (List.nth_exn seperate_dates 1)
+      , Int.of_string (List.nth_exn seperate_dates 2) )
+    in
+    let minute_list = String.concat (List.tl_exn time_list) in
+    let seperate_times = String.split minute_list ~on:':' in
+    let hour, minute =
+      ( Int.of_string (List.nth_exn seperate_times 0)
+      , Int.of_string (List.nth_exn seperate_times 1) )
+    in
+    { year; month; day; hour; minute }
+  ;;
+end
+
+module Minute_Data = struct
+  module T = struct
+    type t =
+      { time : Time.t
+      ; price : float
+      }
+    [@@deriving compare, sexp]
+  end
+
+  include T
+  include Comparable.Make (T)
+
+  let create ~time ~price =
+    let time = Time.create time in
+    { time; price }
+  ;;
+end
+
+module Total_Minute_Data = struct
+  module T = struct
+    type t =
+      { crypto : Crypto.t
+      ; mutable data : Minute_Data.t list
+      }
+    [@@deriving compare, sexp]
+  end
+
+  include T
+  include Comparable.Make (T)
+
+  let create ~crypto = { crypto; data = [] }
+  let add_day_data t day = t.data <- t.data @ [ day ]
 end
 
 module Date = struct

@@ -1,6 +1,24 @@
 open! Core
 
-let get_data coin =
+let get_minute_data coin =
+  let data_file = Types.Crypto.get_data_file coin in
+  let curr_file = In_channel.read_lines data_file in
+  let total_data = Types.Total_Minute_Data.create ~crypto:coin in
+  List.iter curr_file ~f:(fun line ->
+    let split_line = String.split line ~on:',' in
+    let curr_list = List.tl_exn split_line in
+    match curr_list with
+    | time :: _filler :: price :: _ ->
+      if not (String.equal price "null")
+      then (
+        let price = Float.of_string price in
+        let day = Types.Minute_Data.create ~time ~price in
+        Types.Total_Minute_Data.add_day_data total_data day)
+    | _ -> ());
+  total_data
+;;
+
+let get_day_data coin =
   let data_file = Types.Crypto.get_data_file coin in
   let curr_file = In_channel.read_lines data_file in
   let total_data = Types.Total_Data.create coin in
