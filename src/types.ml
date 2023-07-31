@@ -14,7 +14,7 @@ module Crypto = struct
 
   let get_data_file t =
     match t with
-    | Bitcoin -> "src/data/bitcoin_test.txt"
+    | Bitcoin -> "src/data/bitcoin_minute.txt"
     | Ethereum -> "data/ethereum_data.txt"
     | XRP -> "data/xrp_data.txt"
   ;;
@@ -85,7 +85,7 @@ module Total_Minute_Data = struct
   include Comparable.Make (T)
 
   let create ~crypto = { crypto; data = [] }
-  let add_day_data t day = t.data <- t.data @ [ day ]
+  let add_day_data t day = t.data <- day :: t.data
 end
 
 module Date = struct
