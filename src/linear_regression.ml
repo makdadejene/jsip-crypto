@@ -30,3 +30,5 @@ let%expect_test "least_squares1" =
     ((weight 1) (bias 0))
       |}]
 ;;
+
+let predict ~weight ~bias ~x_val = (x_val *. weight) +. bias
