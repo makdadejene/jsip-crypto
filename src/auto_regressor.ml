@@ -41,12 +41,10 @@ module Model = struct
     t.sigma <- sigma
   ;;
 
-  let fit (data : Types.Total_Data.t) t =
-    let dataset = Types.Total_Data.get_all_dates_prices data () in
-    let weight, bias = linear_regression_function dataset in
-    t.weight <- weight;
-    t.bias <- bias
-  ;;
+  (* let fit (data : Types.Total_Data.t) t = let dataset =
+     Types.Total_Data.get_all_dates_prices data () in let weight, bias =
+     linear_regression_function dataset in t.weight <- weight; t.bias <- bias
+     ;; *)
 end
 
 module AutoRegressor = struct
