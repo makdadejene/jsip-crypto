@@ -54,23 +54,6 @@ module Time = struct
     in
     { year; month; day; hour; minute; seconds }
   ;;
-
-  let time_to_unix t =
-    let year, month, day, hour, minute =
-      t.year, t.month, t.day, t.hour, t.minute
-    in
-    let base_unix = (1970 * 31556926) + 86400 in
-    let current_time =
-      (year * 31556926)
-      + ((month - 1) * 2629743)
-      + (day * 86400)
-      + (hour * 3600)
-      + (minute * 60)
-    in
-    current_time - base_unix
-  ;;
-
-  (* let unix_to_time unix = () *)
 end
 
 module Minute_Data = struct
@@ -128,6 +111,17 @@ module Date = struct
       , Int.of_string (List.nth_exn date_list 2) )
     in
     { year; month; day }
+  ;;
+
+  let time_to_unix date_string =
+    let utc_string = date_string ^ " 00:00:00Z" in
+    Time_ns.to_span_since_epoch
+      (Time_ns.of_string_with_utc_offset utc_string)
+    |> Time_ns.Span.to_sec
+  ;;
+
+  let unix_to_time unix_string =
+    Time_ns.of_span_since_epoch unix_string |> Time_ns.to_string_utc
   ;;
 
   let is_leap_year t =
@@ -233,10 +227,15 @@ module Total_Data = struct
 end
 
 let%expect_test "unix_1" =
-  let curr_date = Time.create "2015-10-09 02:04:00" in
-  let to_unix = Time.time_to_unix curr_date in
-  print_s [%message (to_unix : int)];
-  [%expect {| (to_unix 1444427997) |}]
+  let to_unix = Date.time_to_unix "2022-07-26" in
+  print_s [%message (to_unix : float)];
+  [%expect {| (to_unix 1658808000) |}]
+;;
+
+let%expect_test "unix_2" =
+  let to_unix = Date.unix_to_time "1444356660" in
+  print_s [%message (to_unix : string)];
+  [%expect {| (to_unix 1658808000) |}]
 ;;
 
 let%expect_test "next_date1" =
