@@ -120,8 +120,23 @@ module Date = struct
     |> Time_ns.Span.to_sec
   ;;
 
-  let unix_to_time unix_string =
-    Time_ns.of_span_since_epoch unix_string |> Time_ns.to_string_utc
+  let unix_to_time (unix_string : string) =
+    unix_string
+    |> Int.of_string
+    |> Time_ns.Span.of_int_sec
+    |> Time_ns.of_span_since_epoch
+    |> Time_ns.to_string_utc
+  ;;
+
+  let%expect_test _ =
+    let test s =
+      let result = unix_to_time s in
+      print_endline result
+    in
+    test "1444356660";
+    [%expect {| 2015-10-09 02:11:00.000000000Z |}];
+    test "1690921547";
+    [%expect {| 2023-08-01 20:25:47.000000000Z |}]
   ;;
 
   let is_leap_year t =
@@ -229,13 +244,14 @@ end
 let%expect_test "unix_1" =
   let to_unix = Date.time_to_unix "2022-07-26" in
   print_s [%message (to_unix : float)];
-  [%expect {| (to_unix 1658808000) |}]
+  [%expect {| (to_unix 1658793600) |}]
 ;;
 
 let%expect_test "unix_2" =
   let to_unix = Date.unix_to_time "1444356660" in
   print_s [%message (to_unix : string)];
-  [%expect {| (to_unix 1658808000) |}]
+  [%expect {| (to_unix "2015-10-09 02:11:00.000000000Z")
+   |}]
 ;;
 
 let%expect_test "next_date1" =
