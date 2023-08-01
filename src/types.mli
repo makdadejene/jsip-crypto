@@ -17,6 +17,7 @@ module Time : sig
     ; day : int
     ; hour : int
     ; minute : int
+    ; seconds : int
     }
   [@@deriving compare, sexp_of]
 

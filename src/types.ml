@@ -14,7 +14,7 @@ module Crypto = struct
 
   let get_data_file t =
     match t with
-    | Bitcoin -> "src/data/bitcoin_minute.txt"
+    | Bitcoin -> "data/btc_data.txt"
     | Ethereum -> "data/ethereum_data.txt"
     | XRP -> "data/xrp_data.txt"
   ;;
@@ -28,6 +28,7 @@ module Time = struct
       ; day : int
       ; hour : int
       ; minute : int
+      ; seconds : int
       }
     [@@deriving compare, sexp]
   end
@@ -46,12 +47,30 @@ module Time = struct
     in
     let minute_list = String.concat (List.tl_exn time_list) in
     let seperate_times = String.split minute_list ~on:':' in
-    let hour, minute =
+    let hour, minute, seconds =
       ( Int.of_string (List.nth_exn seperate_times 0)
-      , Int.of_string (List.nth_exn seperate_times 1) )
+      , Int.of_string (List.nth_exn seperate_times 1)
+      , 0 )
     in
-    { year; month; day; hour; minute }
+    { year; month; day; hour; minute; seconds }
   ;;
+
+  let time_to_unix t =
+    let year, month, day, hour, minute =
+      t.year, t.month, t.day, t.hour, t.minute
+    in
+    let base_unix = (1970 * 31556926) + 86400 in
+    let current_time =
+      (year * 31556926)
+      + ((month - 1) * 2629743)
+      + (day * 86400)
+      + (hour * 3600)
+      + (minute * 60)
+    in
+    current_time - base_unix
+  ;;
+
+  (* let unix_to_time unix = () *)
 end
 
 module Minute_Data = struct
@@ -213,6 +232,13 @@ module Total_Data = struct
   include Comparable.Make (T)
 end
 
+let%expect_test "unix_1" =
+  let curr_date = Time.create "2015-10-09 02:04:00" in
+  let to_unix = Time.time_to_unix curr_date in
+  print_s [%message (to_unix : int)];
+  [%expect {| (to_unix 1444427997) |}]
+;;
+
 let%expect_test "next_date1" =
   let next_date =
     Date.next_date { Date.year = 2001; month = 12; day = 30 }
@@ -253,7 +279,7 @@ let%expect_test "get_all_dates_prices1" =
   [%expect
     {|
     (dates_prices_data
-      ((((year 2022) (month 7) (day 20)) 0) (((year 2022) (month 7) (day 21)) 1)
+     ((((year 2022) (month 7) (day 20)) 0) (((year 2022) (month 7) (day 21)) 1)
       (((year 2022) (month 7) (day 22)) 2) (((year 2022) (month 7) (day 23)) 3)
       (((year 2022) (month 7) (day 24)) 4) (((year 2022) (month 7) (day 25)) 5)
       (((year 2022) (month 7) (day 26)) 6) (((year 2022) (month 7) (day 27)) 7)

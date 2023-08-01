@@ -4,7 +4,7 @@ open! Crypto_src.Types.Crypto
 
 (* let () = Command_unix.run Visualize_graph.visualize_command *)
 
-let _bitcoin_data = Fetch_data.get_minute_data Bitcoin
+(* let _bitcoin_data = Fetch_data.get_minute_data Bitcoin *)
 
 (* let _ethereum_data = Fetch_data.get_data Ethereum let _xrp_data =
    Fetch_data.get_data XRP;; let _mvg = Moving_average.get_moving_avgs

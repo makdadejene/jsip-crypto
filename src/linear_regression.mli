@@ -1,1 +1,1 @@
-val ordinary_least_squares : (Types.Date.t * float) list -> float * float
+val ordinary_least_squares : (float * float) list -> float * float
