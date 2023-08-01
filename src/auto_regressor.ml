@@ -49,15 +49,12 @@ end
 
 module AutoRegressor = struct
   type t =
-    { time_steps : int
-    ; prediction : Prediction.t list
-    ; hyperparameters : Hyperparameters.t
-    ; model : Model.t
+    { p : int
+    ; q : int
+    ; dataset : Types.Total_Data.t
     }
 
-  let create_hyperparameters (_data : Types.Total_Data.t) = ()
-  let calculate_model_residual (_data : Types.Total_Data.t) = ()
-  let create_model (_data : Types.Total_Data.t) (_time_steps : int) = ()
+  let create_model (data : Types.Total_Data.t) (p : int) = data, p
   let update_parameters t = t
-  let predict_next_price () = ()
+  let predict_next_n_prices t ~num_predictions = t, num_predictions
 end
