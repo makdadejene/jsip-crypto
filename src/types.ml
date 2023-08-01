@@ -165,6 +165,13 @@ module Day_Data = struct
     let date = Date.create date in
     { date; open_; high; low; close; volume }
   ;;
+
+  let get_date t = t.date
+  let get_open_ t = t.open_
+  let get_high t = t.high
+  let get_low t = t.low
+  let get_close t = t.close
+  let get_volume t = t.volume
 end
 
 module Total_Data = struct
@@ -178,6 +185,28 @@ module Total_Data = struct
     let create crypto = { crypto; days = [] }
     let add_day_data t day = t.days <- t.days @ [ day ]
     let add_days_data t days = t.days <- t.days @ days
+
+    let get_all_dates_prices t ?(market_data_type = "close") () =
+      match market_data_type with
+      | "close" ->
+        List.map t.days ~f:(fun day ->
+          Day_Data.get_date day, Day_Data.get_close day)
+      | "open_" ->
+        List.map t.days ~f:(fun day ->
+          Day_Data.get_date day, Day_Data.get_open_ day)
+      | "high" ->
+        List.map t.days ~f:(fun day ->
+          Day_Data.get_date day, Day_Data.get_high day)
+      | "low" ->
+        List.map t.days ~f:(fun day ->
+          Day_Data.get_date day, Day_Data.get_low day)
+      | _ -> failwith ("Incorrect market type given: " ^ market_data_type)
+    ;;
+
+    let get_all_dates_volume t =
+      List.map t.days ~f:(fun day ->
+        Day_Data.get_date day, Day_Data.get_volume day)
+    ;;
   end
 
   include T
@@ -204,4 +233,30 @@ let%expect_test "next_date3" =
   let next_date = Date.next_date { Date.year = 1900; month = 2; day = 28 } in
   print_s [%message (next_date : Date.t)];
   [%expect {| (next_date ((year 1900) (month 3) (day 1))) |}]
+;;
+
+let%expect_test "get_all_dates_prices1" =
+  let total_data = Total_Data.create Crypto.Bitcoin in
+  let days =
+    List.init 10 ~f:(fun int ->
+      Day_Data.create
+        ~date:("2022-07-2" ^ Int.to_string int)
+        ~open_:0.
+        ~high:0.
+        ~low:0.
+        ~close:(Int.to_float int)
+        ~volume:0)
+  in
+  Total_Data.add_days_data total_data days;
+  let dates_prices_data = Total_Data.get_all_dates_prices total_data () in
+  print_s [%message (dates_prices_data : (Date.t * float) list)];
+  [%expect
+    {|
+    (dates_prices_data
+      ((((year 2022) (month 7) (day 20)) 0) (((year 2022) (month 7) (day 21)) 1)
+      (((year 2022) (month 7) (day 22)) 2) (((year 2022) (month 7) (day 23)) 3)
+      (((year 2022) (month 7) (day 24)) 4) (((year 2022) (month 7) (day 25)) 5)
+      (((year 2022) (month 7) (day 26)) 6) (((year 2022) (month 7) (day 27)) 7)
+      (((year 2022) (month 7) (day 28)) 8) (((year 2022) (month 7) (day 29)) 9)))
+      |}]
 ;;

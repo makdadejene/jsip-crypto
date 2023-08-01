@@ -27,20 +27,25 @@ module Model = struct
     ; mutable sigma : float
     }
 
-  let linear_regression_function = (fun x_values y_values -> List.hd_exn x_values, List.hd_exn y_values)
+  let linear_regression_function = Linear_regression.ordinary_least_squares
 
-  (* let update_sigma (data : Types.Total_Data.t) t =
-    let day_values = Types.Total_Data.get_all_day_data data in
-    let day_values = Array.of_list day_values in
-    let sigma = Owl_base_stats.std day_values in
+  let update_sigma (data : Types.Total_Data.t) t =
+    let day_prices_data = Types.Total_Data.get_all_dates_prices data () in
+    let _dates, prices =
+      ( Array.of_list
+          (List.map day_prices_data ~f:(fun data_tuple -> fst data_tuple))
+      , Array.of_list
+          (List.map day_prices_data ~f:(fun data_tuple -> snd data_tuple)) )
+    in
+    let sigma = Owl_base_stats.std prices in
     t.sigma <- sigma
   ;;
 
   let fit (data : Types.Total_Data.t) t =
-    let x, y = Types.Total_Data.get_all_times data in
-    let weight, bias = linear_regression_function x y in
+    let dataset = Types.Total_Data.get_all_dates_prices data () in
+    let weight, bias = linear_regression_function dataset in
     t.weight <- weight;
-    t.bias <- bias *)
+    t.bias <- bias
   ;;
 end
 
