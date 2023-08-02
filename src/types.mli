@@ -106,5 +106,5 @@ module Total_Data : sig
     -> (Date.t * float) list
 
   val get_all_dates_volume : t -> (Date.t * int) list
-  val last_n_day_dataset : t -> num_of_days:int -> t
+  val last_n_days_dataset : t -> num_of_days:int -> t
 end

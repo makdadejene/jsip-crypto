@@ -41,10 +41,13 @@ module Model = struct
     t.sigma <- sigma
   ;;
 
-  (* let fit (data : Types.Total_Data.t) t = let dataset =
-     Types.Total_Data.get_all_dates_prices data () in let weight, bias =
-     linear_regression_function dataset in t.weight <- weight; t.bias <- bias
-     ;; *)
+  (* let fit (data : Types.Total_Data.t) t = 
+    let dataset = Types.Total_Data.get_all_dates_prices data () in
+    let dataset = List.map dataset ~f:(fun date, price -> Types. ) 
+    let weight, bias = linear_regression_function dataset in 
+    t.weight <- weight; 
+    t.bias <- bias
+    ;; *)
 end
 
 module AutoRegressor = struct
@@ -61,7 +64,8 @@ module AutoRegressor = struct
   let update_parameters t = t
 
   (* let predict_next_price t = 
-    let training_dataset = Total_Data.last_n_days_dataset dataset t in
+    let training_dataset = Types.Total_Data.last_n_days_dataset (dataset t) ~num_of_days:(p t) in
+    let 
 
     weight, bias = Model.fit
     t, num_predictions
