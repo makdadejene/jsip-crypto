@@ -54,7 +54,18 @@ module AutoRegressor = struct
     ; dataset : Types.Total_Data.t
     }
 
+  let p t = t.p
+  let q t = t.q
+  let dataset t = t.dataset
   let create_model (data : Types.Total_Data.t) (p : int) = data, p
   let update_parameters t = t
-  let predict_next_n_prices t ~num_predictions = t, num_predictions
+
+  (* let predict_next_price t = 
+    let training_dataset = Total_Data.last_n_days_dataset dataset t in
+
+    weight, bias = Model.fit
+    t, num_predictions
+
+  let predict_next_n_prices t ~num_predictions =
+  ;; *)
 end

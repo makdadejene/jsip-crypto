@@ -93,6 +93,8 @@ module Total_Data : sig
     }
   [@@deriving compare, sexp_of]
 
+  val crypto : t -> Crypto.t
+  val days : t -> Day_Data.t list
   val create : Crypto.t -> t
   val add_day_data : t -> Day_Data.t -> unit
   val add_days_data : t -> Day_Data.t list -> unit
@@ -104,4 +106,5 @@ module Total_Data : sig
     -> (Date.t * float) list
 
   val get_all_dates_volume : t -> (Date.t * int) list
+  val last_n_day_dataset : t -> num_of_days:int -> t
 end

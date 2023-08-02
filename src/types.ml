@@ -210,6 +210,8 @@ module Total_Data = struct
       }
     [@@deriving compare, sexp]
 
+    let crypto t = t.crypto
+    let days t = t.days
     let create crypto = { crypto; days = [] }
     let add_day_data t day = t.days <- t.days @ [ day ]
     let add_days_data t days = t.days <- t.days @ days
@@ -234,6 +236,16 @@ module Total_Data = struct
     let get_all_dates_volume t =
       List.map t.days ~f:(fun day ->
         Day_Data.get_date day, Day_Data.get_volume day)
+    ;;
+
+    let last_n_days_dataset t ~num_of_days =
+      if num_of_days > List.length (days t)
+      then
+        failwith
+          "(num_of_days) is greater than the number of days in the dataset"
+      else (
+        let days = List.rev (List.take (List.rev (days t)) num_of_days) in
+        { crypto = crypto t; days })
     ;;
   end
 
@@ -300,4 +312,100 @@ let%expect_test "get_all_dates_prices1" =
       (((year 2022) (month 7) (day 26)) 6) (((year 2022) (month 7) (day 27)) 7)
       (((year 2022) (month 7) (day 28)) 8) (((year 2022) (month 7) (day 29)) 9)))
       |}]
+;;
+
+let%expect_test "last_n_days_dataset1" =
+  let total_data = Total_Data.create Crypto.Bitcoin in
+  let days =
+    List.init 10 ~f:(fun int ->
+      Day_Data.create
+        ~date:("2022-07-2" ^ Int.to_string int)
+        ~open_:0.
+        ~high:0.
+        ~low:0.
+        ~close:(Int.to_float int)
+        ~volume:0)
+  in
+  Total_Data.add_days_data total_data days;
+  let last_n_days =
+    Total_Data.last_n_days_dataset total_data ~num_of_days:3
+  in
+  print_s [%message (last_n_days : Total_Data.t)];
+  [%expect
+    {|
+    (last_n_days
+     ((crypto Bitcoin)
+      (days
+       (((date ((year 2022) (month 7) (day 27))) (open_ 0) (high 0) (low 0)
+         (close 7) (volume 0))
+        ((date ((year 2022) (month 7) (day 28))) (open_ 0) (high 0) (low 0)
+         (close 8) (volume 0))
+        ((date ((year 2022) (month 7) (day 29))) (open_ 0) (high 0) (low 0)
+         (close 9) (volume 0))))))
+      |}]
+;;
+
+let%expect_test "last_n_days_dataset2" =
+  let total_data = Total_Data.create Crypto.Bitcoin in
+  let days =
+    List.init 10 ~f:(fun int ->
+      Day_Data.create
+        ~date:("2022-07-2" ^ Int.to_string int)
+        ~open_:0.
+        ~high:0.
+        ~low:0.
+        ~close:(Int.to_float int)
+        ~volume:0)
+  in
+  Total_Data.add_days_data total_data days;
+  let last_n_days =
+    Total_Data.last_n_days_dataset total_data ~num_of_days:5
+  in
+  print_s [%message (last_n_days : Total_Data.t)];
+  [%expect
+    {|
+    (last_n_days
+     ((crypto Bitcoin)
+      (days
+       (((date ((year 2022) (month 7) (day 25))) (open_ 0) (high 0) (low 0)
+         (close 5) (volume 0))
+        ((date ((year 2022) (month 7) (day 26))) (open_ 0) (high 0) (low 0)
+         (close 6) (volume 0))
+        ((date ((year 2022) (month 7) (day 27))) (open_ 0) (high 0) (low 0)
+         (close 7) (volume 0))
+        ((date ((year 2022) (month 7) (day 28))) (open_ 0) (high 0) (low 0)
+         (close 8) (volume 0))
+        ((date ((year 2022) (month 7) (day 29))) (open_ 0) (high 0) (low 0)
+         (close 9) (volume 0))))))
+      |}]
+;;
+
+let%expect_test "last_n_days_dataset3" =
+  let total_data = Total_Data.create Crypto.Bitcoin in
+  let days =
+    List.init 10 ~f:(fun int ->
+      Day_Data.create
+        ~date:("2022-07-2" ^ Int.to_string int)
+        ~open_:0.
+        ~high:0.
+        ~low:0.
+        ~close:(Int.to_float int)
+        ~volume:0)
+  in
+  Total_Data.add_days_data total_data days;
+  let last_n_days =
+    Total_Data.last_n_days_dataset total_data ~num_of_days:11
+  in
+  print_s [%message (last_n_days : Total_Data.t)];
+  [%expect.unreachable]
+  [@@expect.uncaught_exn
+    {|
+  (* CR expect_test_collector: This test expectation appears to contain a backtrace.
+     This is strongly discouraged as backtraces are fragile.
+     Please change this test to not include a backtrace. *)
+
+  (Failure "(num_of_days) is greater than the number of days in the dataset")
+  Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
+  Called from Crypto_src__Types.(fun) in file "src/types.ml", line 397, characters 4-61
+  Called from Expect_test_collector.Make.Instance_io.exec in file "collector/expect_test_collector.ml", line 234, characters 12-19 |}]
 ;;
