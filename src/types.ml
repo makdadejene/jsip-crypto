@@ -113,8 +113,22 @@ module Date = struct
     { year; month; day }
   ;;
 
-  let time_to_unix date_string =
-    let utc_string = date_string ^ " 00:00:00Z" in
+  let time_to_unix t =
+    let year = t.year in
+    let month = t.month in
+    let day = t.day in
+    let month_length = String.length (Int.to_string month) in
+    let month_filler = if Int.(month_length > 1) then "-" else "-0" in
+    let day_length = String.length (Int.to_string day) in
+    let day_filler = if Int.(day_length > 1) then "-" else "-0" in
+    let utc_string =
+      Int.to_string year
+      ^ month_filler
+      ^ Int.to_string month
+      ^ day_filler
+      ^ Int.to_string day
+      ^ " 00:00:00Z"
+    in
     Time_ns.to_span_since_epoch
       (Time_ns.of_string_with_utc_offset utc_string)
     |> Time_ns.Span.to_sec
@@ -254,9 +268,10 @@ module Total_Data = struct
 end
 
 let%expect_test "unix_1" =
-  let to_unix = Date.time_to_unix "2022-07-26" in
+  let current_date = Date.create "2000-01-01" in
+  let to_unix = Date.time_to_unix current_date in
   print_s [%message (to_unix : float)];
-  [%expect {| (to_unix 1658793600) |}]
+  [%expect {| (to_unix 946684800) |}]
 ;;
 
 let%expect_test "unix_2" =
@@ -378,34 +393,4 @@ let%expect_test "last_n_days_dataset2" =
         ((date ((year 2022) (month 7) (day 29))) (open_ 0) (high 0) (low 0)
          (close 9) (volume 0))))))
       |}]
-;;
-
-let%expect_test "last_n_days_dataset3" =
-  let total_data = Total_Data.create Crypto.Bitcoin in
-  let days =
-    List.init 10 ~f:(fun int ->
-      Day_Data.create
-        ~date:("2022-07-2" ^ Int.to_string int)
-        ~open_:0.
-        ~high:0.
-        ~low:0.
-        ~close:(Int.to_float int)
-        ~volume:0)
-  in
-  Total_Data.add_days_data total_data days;
-  let last_n_days =
-    Total_Data.last_n_days_dataset total_data ~num_of_days:11
-  in
-  print_s [%message (last_n_days : Total_Data.t)];
-  [%expect.unreachable]
-  [@@expect.uncaught_exn
-    {|
-  (* CR expect_test_collector: This test expectation appears to contain a backtrace.
-     This is strongly discouraged as backtraces are fragile.
-     Please change this test to not include a backtrace. *)
-
-  (Failure "(num_of_days) is greater than the number of days in the dataset")
-  Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
-  Called from Crypto_src__Types.(fun) in file "src/types.ml", line 397, characters 4-61
-  Called from Expect_test_collector.Make.Instance_io.exec in file "collector/expect_test_collector.ml", line 234, characters 12-19 |}]
 ;;

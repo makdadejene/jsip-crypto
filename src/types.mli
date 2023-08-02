@@ -54,7 +54,7 @@ module Date : sig
   [@@deriving compare, sexp_of]
 
   val create : string -> t
-  val time_to_unix : string -> float
+  val time_to_unix : t -> float
   val unix_to_time : string -> string
 end
 
