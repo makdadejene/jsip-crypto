@@ -53,20 +53,13 @@ end
 module AutoRegressor = struct
   type t =
     { mutable p : int
-    ; mutable q : int
     ; mutable dataset : Types.Total_Data.t
     }
 
   let p t = t.p
-  let q t = t.q
   let dataset t = t.dataset
-  let create ~dataset ?(p = 3) ?(q = 3) () = { p; q; dataset }
-
-  let update_parameters t p q =
-    t.p <- p;
-    t.q <- q
-  ;;
-
+  let create ~dataset ?(p = 3) () = { p; dataset }
+  let update_parameters t p = t.p <- p
   let update_dateset t ~new_dataset = t.dataset <- new_dataset
 
   let predict_next_price t =
