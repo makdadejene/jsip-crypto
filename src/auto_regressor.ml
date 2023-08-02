@@ -4,8 +4,11 @@ open! Owl_base
 module Prediction = struct
   type t =
     { date : Types.Date.t
-    ; price : int
+    ; prediction : float
     }
+  [@@deriving sexp_of]
+
+  let create date prediction = { date; prediction }
 end
 
 module Hyperparameters = struct
@@ -57,20 +60,25 @@ module AutoRegressor = struct
   let p t = t.p
   let q t = t.q
   let dataset t = t.dataset
-  let create_model (data : Types.Total_Data.t) (p : int) = data, p
+  let create ~dataset ?(p = 3) ?(q = 3) () = { p; q; dataset }
 
   let update_parameters t p q =
     t.p <- p;
     t.q <- q
   ;;
 
+  let update_dateset t ~new_dataset = t.dataset <- new_dataset
+
   let predict_next_price t =
     let training_dataset =
       Types.Total_Data.last_n_days_dataset (dataset t) ~num_of_days:(p t)
     in
+    let next_date = Types.Total_Data.next_day_date training_dataset in
+    let next_date_unix = Types.Date.time_to_unix next_date in
     let model = Model.create () in
     Model.fit model training_dataset;
-    Model.predict model
+    let prediction = Model.predict model ~x_val:next_date_unix in
+    Prediction.create next_date prediction
   ;;
 
   (* let predict_next_n_prices t ~num_predictions = let training_dataset =
@@ -78,11 +86,11 @@ module AutoRegressor = struct
      for i = 1 to num_predictions do ( predict_next_price t ) done ;; *)
 end
 
-(* let%expect_test "last_n_days_dataset2" =
-  let total_data = Total_Data.create Crypto.Bitcoin in
+let%expect_test "predict_next_price" =
+  let total_data = Types.Total_Data.create Types.Crypto.Bitcoin in
   let days =
     List.init 10 ~f:(fun int ->
-      Day_Data.create
+      Types.Day_Data.create
         ~date:("2022-07-2" ^ Int.to_string int)
         ~open_:0.
         ~high:0.
@@ -90,25 +98,13 @@ end
         ~close:(Int.to_float int)
         ~volume:0)
   in
-  Total_Data.add_days_data total_data days;
-  let last_n_days =
-    Total_Data.last_n_days_dataset total_data ~num_of_days:5
+  Types.Total_Data.add_days_data total_data days;
+  let autoregressor_model = AutoRegressor.create ~dataset:total_data () in
+  let predicted_price =
+    AutoRegressor.predict_next_price autoregressor_model
   in
-  print_s [%message (last_n_days : Total_Data.t)];
+  print_s [%message (predicted_price : Prediction.t)];
   [%expect
-    {|
-    (last_n_days
-     ((crypto Bitcoin)
-      (days
-       (((date ((year 2022) (month 7) (day 25))) (open_ 0) (high 0) (low 0)
-         (close 5) (volume 0))
-        ((date ((year 2022) (month 7) (day 26))) (open_ 0) (high 0) (low 0)
-         (close 6) (volume 0))
-        ((date ((year 2022) (month 7) (day 27))) (open_ 0) (high 0) (low 0)
-         (close 7) (volume 0))
-        ((date ((year 2022) (month 7) (day 28))) (open_ 0) (high 0) (low 0)
-         (close 8) (volume 0))
-        ((date ((year 2022) (month 7) (day 29))) (open_ 0) (high 0) (low 0)
-         (close 9) (volume 0))))))
-      |}]
-;; *)
+    {| 
+   (predicted_price ((date ((year 2022) (month 7) (day 30))) (prediction 10))) |}]
+;;

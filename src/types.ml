@@ -230,6 +230,12 @@ module Total_Data = struct
     let add_day_data t day = t.days <- t.days @ [ day ]
     let add_days_data t days = t.days <- t.days @ days
 
+    let remove_first_day_data t =
+      match days t with
+      | [] -> failwith "There are no days in the dataset"
+      | days -> t.days <- List.tl_exn days
+    ;;
+
     let get_all_dates_prices t ?(market_data_type = "close") () =
       match market_data_type with
       | "close" ->
@@ -262,6 +268,12 @@ module Total_Data = struct
       match days t with
       | [] -> failwith "There are no days in the dataset"
       | days -> List.last_exn days
+    ;;
+
+    let next_day_date t =
+      let last_day = get_last_day t in
+      let last_day_date = Day_Data.get_date last_day in
+      Date.next_date last_day_date
     ;;
 
     let last_n_days_dataset t ~num_of_days =

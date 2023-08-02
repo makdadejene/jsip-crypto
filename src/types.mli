@@ -98,8 +98,7 @@ module Total_Data : sig
   val create : Crypto.t -> t
   val add_day_data : t -> Day_Data.t -> unit
   val add_days_data : t -> Day_Data.t list -> unit
-  val get_first_day : t -> Day_Data.t
-  val get_last_day : t -> Day_Data.t
+  val remove_first_day_data : t -> unit
 
   val get_all_dates_prices
     :  t
@@ -108,5 +107,8 @@ module Total_Data : sig
     -> (Date.t * float) list
 
   val get_all_dates_volume : t -> (Date.t * int) list
+  val get_first_day : t -> Day_Data.t
+  val get_last_day : t -> Day_Data.t
+  val next_day_date : t -> Date.t
   val last_n_days_dataset : t -> num_of_days:int -> t
 end
