@@ -252,6 +252,18 @@ module Total_Data = struct
         Day_Data.get_date day, Day_Data.get_volume day)
     ;;
 
+    let get_first_day t =
+      match days t with
+      | [] -> failwith "There are no days in the dataset"
+      | days -> List.hd_exn days
+    ;;
+
+    let get_last_day t =
+      match days t with
+      | [] -> failwith "There are no days in the dataset"
+      | days -> List.last_exn days
+    ;;
+
     let last_n_days_dataset t ~num_of_days =
       if num_of_days > List.length (days t)
       then

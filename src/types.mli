@@ -98,6 +98,8 @@ module Total_Data : sig
   val create : Crypto.t -> t
   val add_day_data : t -> Day_Data.t -> unit
   val add_days_data : t -> Day_Data.t list -> unit
+  val get_first_day : t -> Day_Data.t
+  val get_last_day : t -> Day_Data.t
 
   val get_all_dates_prices
     :  t
