@@ -8,6 +8,12 @@ module Prediction : sig
   val prediction : t -> float
   val date : t -> Types.Date.t
   val create : Types.Date.t -> float -> t
+
+  val average_predictions
+    :  first_prediction:t
+    -> second_prediction:t
+    -> prediction_coeff:float
+    -> t
 end
 
 module Hyperparameters : sig
@@ -42,6 +48,7 @@ module AutoRegressor : sig
     ; mutable dataset : Types.Total_Data.t
     }
 
+  val sexp_of_t : t -> Sexplib0.Sexp.t
   val p : t -> int
   val dataset : t -> Types.Total_Data.t
   val create : dataset:Types.Total_Data.t -> ?p:int -> unit -> t

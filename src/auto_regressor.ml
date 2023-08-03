@@ -12,6 +12,24 @@ module Prediction = struct
   let date t = t.date
   let prediction t = t.prediction
   let create date prediction = { date; prediction }
+
+  let average_predictions
+    ~first_prediction
+    ~second_prediction
+    ~(prediction_coeff : float)
+    =
+    if (not Float.(0. <=. prediction_coeff))
+       && Float.(prediction_coeff <. 1.)
+    then failwith "prediction coeffcient must be in [0,1]"
+    else if Types.Date.equal (date first_prediction) (date second_prediction)
+    then failwith "predictions must happen on the same day"
+    else (
+      let prediction =
+        (prediction first_prediction *. prediction_coeff)
+        +. (prediction second_prediction *. (1. -. prediction_coeff))
+      in
+      { date = date first_prediction; prediction })
+  ;;
 end
 
 module Hyperparameters = struct
@@ -58,6 +76,7 @@ module AutoRegressor = struct
     { mutable p : int
     ; mutable dataset : Types.Total_Data.t
     }
+  [@@deriving sexp_of]
 
   let p t = t.p
   let dataset t = t.dataset
@@ -152,7 +171,7 @@ let%expect_test "graphing_larger_dataset_ar_model" =
       (List.map
          (Types.Total_Data.get_all_dates_prices total_data ())
          ~f:(fun data_tuple ->
-         Types.Date.time_to_unix (fst data_tuple), snd data_tuple))
+           Types.Date.time_to_unix (fst data_tuple), snd data_tuple))
   in
   let prediction_series =
     Gp.Series.points_xy

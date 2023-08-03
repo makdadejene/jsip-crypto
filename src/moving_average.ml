@@ -7,6 +7,7 @@ module MovingAverageModel = struct
     ; mutable moving_average_window : int
     ; mutable dataset : Types.Total_Data.t
     }
+  [@@deriving sexp_of]
 
   let q t = t.q
   let moving_avereage_window t = t.moving_average_window
