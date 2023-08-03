@@ -101,3 +101,29 @@ let%expect_test "predict_next_price" =
     {| 
    (predicted_price ((date ((year 2022) (month 7) (day 30))) (prediction 10))) |}]
 ;;
+
+let%expect_test "predict_next_price" =
+  let total_data = Types.Total_Data.create Types.Crypto.Bitcoin in
+  let days =
+    List.init 10 ~f:(fun int ->
+      Types.Day_Data.create
+        ~date:("2022-07-2" ^ Int.to_string int)
+        ~open_:0.
+        ~high:0.
+        ~low:0.
+        ~close:(Int.to_float (int + (int % 2 * 2) - 1))
+        ~volume:0)
+  in
+  Types.Total_Data.add_days_data total_data days;
+  let autoregressor_model =
+    AutoRegressor.create ~dataset:total_data ~p:3 ()
+  in
+  let predicted_price =
+    AutoRegressor.predict_next_price autoregressor_model
+  in
+  print_s [%message (predicted_price : Prediction.t)];
+  [%expect
+    {| 
+   (predicted_price
+    ((date ((year 2022) (month 7) (day 30))) (prediction 10.333333333332121))) |}]
+;;
