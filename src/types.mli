@@ -71,11 +71,22 @@ module Day_Data : sig
 
   val create
     :  date:string
-    -> open_:float
-    -> high:float
-    -> low:float
-    -> close:float
-    -> volume:int
+    -> ?open_:float
+    -> ?high:float
+    -> ?low:float
+    -> ?close:float
+    -> ?volume:int
+    -> unit
+    -> t
+
+  val create_with_date
+    :  date:Date.t
+    -> ?open_:float
+    -> ?high:float
+    -> ?low:float
+    -> ?close:float
+    -> ?volume:int
+    -> unit
     -> t
 
   val get_date : t -> Date.t
@@ -96,6 +107,7 @@ module Total_Data : sig
   val crypto : t -> Crypto.t
   val days : t -> Day_Data.t list
   val create : Crypto.t -> t
+  val create_from_date_price : Crypto.t -> (Date.t * float) list -> t
   val add_day_data : t -> Day_Data.t -> unit
   val add_days_data : t -> Day_Data.t list -> unit
   val remove_first_day_data : t -> unit

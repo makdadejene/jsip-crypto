@@ -203,10 +203,29 @@ module Day_Data = struct
   include T
   include Comparable.Make (T)
 
-  let create ~date ~open_ ~high ~low ~close ~volume =
+  let create
+    ~date
+    ?(open_ = 0.)
+    ?(high = 0.)
+    ?(low = 0.)
+    ?(close = 0.)
+    ?(volume = 0)
+    ()
+    =
     let date = Date.create date in
     { date; open_; high; low; close; volume }
   ;;
+
+  let create_with_date
+    ~date
+    ?(open_ = 0.)
+    ?(high = 0.)
+    ?(low = 0.)
+    ?(close = 0.)
+    ?(volume = 0)
+    ()
+    =
+    { date; open_; high; low; close; volume }
 
   let get_date t = t.date
   let get_open_ t = t.open_
@@ -227,6 +246,17 @@ module Total_Data = struct
     let crypto t = t.crypto
     let days t = t.days
     let create crypto = { crypto; days = [] }
+
+    let create_from_date_price crypto data_list =
+      let days_list =
+        List.map data_list ~f:(fun data_tuple ->
+          let date = fst data_tuple in
+          let close = snd data_tuple in
+          Day_Data.create_with_date ~date ~close ())
+      in
+      { crypto; days = days_list }
+    ;;
+
     let add_day_data t day = t.days <- t.days @ [ day ]
     let add_days_data t days = t.days <- t.days @ days
 
@@ -333,11 +363,8 @@ let%expect_test "get_all_dates_prices1" =
     List.init 10 ~f:(fun int ->
       Day_Data.create
         ~date:("2022-07-2" ^ Int.to_string int)
-        ~open_:0.
-        ~high:0.
-        ~low:0.
         ~close:(Int.to_float int)
-        ~volume:0)
+        ())
   in
   Total_Data.add_days_data total_data days;
   let dates_prices_data = Total_Data.get_all_dates_prices total_data () in
@@ -359,11 +386,8 @@ let%expect_test "last_n_days_dataset1" =
     List.init 10 ~f:(fun int ->
       Day_Data.create
         ~date:("2022-07-2" ^ Int.to_string int)
-        ~open_:0.
-        ~high:0.
-        ~low:0.
         ~close:(Int.to_float int)
-        ~volume:0)
+        ())
   in
   Total_Data.add_days_data total_data days;
   let last_n_days =
@@ -390,11 +414,8 @@ let%expect_test "last_n_days_dataset2" =
     List.init 10 ~f:(fun int ->
       Day_Data.create
         ~date:("2022-07-2" ^ Int.to_string int)
-        ~open_:0.
-        ~high:0.
-        ~low:0.
         ~close:(Int.to_float int)
-        ~volume:0)
+        ())
   in
   Total_Data.add_days_data total_data days;
   let last_n_days =

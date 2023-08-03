@@ -34,7 +34,7 @@ let get_day_data coin =
           , Int.of_string volume )
         in
         let day =
-          Types.Day_Data.create ~date ~open_ ~high ~low ~close ~volume
+          Types.Day_Data.create ~date ~open_ ~high ~low ~close ~volume ()
         in
         Types.Total_Data.add_day_data total_data day)
     | _ -> ());
