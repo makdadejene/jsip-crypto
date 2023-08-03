@@ -1,5 +1,5 @@
 (library
- (name crypto_src)
+ (name interface_lib)
  (libraries
   core
   curl
@@ -13,4 +13,4 @@
  (inline_tests
   (deps ./data/btc_data.txt))
  (preprocess
-  (pps ppx_jane pps ppx_deriving_yojson)))
+  (pps ppx_jane)))
