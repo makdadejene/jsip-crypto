@@ -1,6 +1,14 @@
 (library
  (name crypto_src)
- (libraries core curl file_path gnuplot owl-base)
+ (libraries
+  core
+  curl
+  file_path
+  gnuplot
+  owl-base
+  async
+  cohttp-async
+  core_unix.command_unix)
  (inline_tests
   (deps ./data/btc_data.txt))
  (preprocess
