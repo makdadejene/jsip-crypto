@@ -1,11 +1,19 @@
 open Core
 open Async_kernel
+open Jsonaf_kernel
 module Server = Cohttp_async.Server
 
 let handler ~body:_ _sock req =
   let uri = Cohttp.Request.uri req in
-  match Uri.path uri with
-  | "/coin" -> Server.respond_string
+  let request = Uri.path uri |> String.split ~on:'/' in
+  match request with
+  | [ coin; year ] ->
+    let response =
+      Simple_model.predict ~coin ~year
+      |> Simple_model.json_of_t
+      |> Josnaf.to_string
+    in
+    Server.respond_string response
   | _ -> Server.respond_string ~status:`Not_found "Route not found"
 ;;
 
