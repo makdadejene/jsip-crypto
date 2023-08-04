@@ -21,7 +21,10 @@ module Prediction = struct
     if (not Float.(0. <=. prediction_coeff))
        && Float.(prediction_coeff <. 1.)
     then failwith "prediction coeffcient must be in [0,1]"
-    else if Types.Date.equal (date first_prediction) (date second_prediction)
+    else if not
+              (Types.Date.equal
+                 (date first_prediction)
+                 (date second_prediction))
     then failwith "predictions must happen on the same day"
     else (
       let prediction =

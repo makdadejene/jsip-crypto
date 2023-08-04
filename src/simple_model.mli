@@ -1,6 +1,3 @@
-val data : Types.Total_Data.t
-val calculate_sma : 'a -> unit
-
 module ArimaModel : sig
   type t =
     { mutable ar_model : Auto_regressor.AutoRegressor.t
