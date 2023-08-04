@@ -3,7 +3,7 @@ open! Crypto_src
 open! Crypto_src.Types.Crypto
 module Gp = Gnuplot
 
-(* let () = Command_unix.run Visualize_graph.visualize_command *)
+let () = Command_unix.run Visualize_graph.command
 
 (* let _bitcoin_data = Fetch_data.get_minute_data Bitcoin *)
 
