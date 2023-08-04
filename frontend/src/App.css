@@ -2,11 +2,6 @@
   text-align: center;
 }
 
-.rect {
-  display: flex;
-  justify-content: center;
-}
-
 .App-logo {
   height: 40vmin;
   pointer-events: none;
