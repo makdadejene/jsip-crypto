@@ -1,4 +1,6 @@
-import { useMemo, useCallback } from 'react';
+import {
+    useMemo, useCallback, useEffect, useState
+} from 'react';
 import { AreaClosed, Line, Bar } from '@visx/shape';
 import appleStock, { AppleStock } from '@visx/mock-data/lib/mocks/appleStock';
 import { curveMonotoneX } from '@visx/curve';
@@ -19,6 +21,8 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
+import Header from "./Header";
+import Legend from "./Legend";
 
 
 type TooltipData = AppleStock;
@@ -64,6 +68,7 @@ export default withTooltip(
         const innerWidth = 1000;
         const innerHeight = 600;
 
+        const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
         const dateScale = useMemo(
             () =>
                 scaleTime({
@@ -104,124 +109,158 @@ export default withTooltip(
             [showTooltip, stockValueScale, dateScale],
         );
 
+
+        useEffect(() => {
+            const handleMouseMove = (event) => {
+                console.log({ x: event.clientX, y: event.clientY });
+                setMousePosition({ x: event.clientX, y: event.clientY });
+            };
+
+            window.addEventListener('mousemove', handleMouseMove);
+
+            return () => {
+                window.removeEventListener(
+                    'mousemove',
+                    handleMouseMove
+                );
+            };
+        }, []);
+
         return (
+            <div>
+                <Header />
 
-            <div style={{ display: 'flex', justifycontent: 'center' }}>
-                <svg width={1000} height={600} style={{ display: 'block', margin: 'auto' }}>
-                    <rect
-                        x={0}
-                        y={0}
-                        width={1000}
-                        height={600}
-                        fill="url(#area-background-gradient)"
-                        rx={14}
-                    />
-                    <LinearGradient id="area-background-gradient" from={background} to={background2} />
-                    <LinearGradient id="area-gradient" from={accentColor} to={accentColor} toOpacity={0.1} />
-                    <GridRows
-                        left={margin.left}
-                        scale={stockValueScale}
-                        width={innerWidth}
-                        strokeDasharray="1,3"
-                        stroke={accentColor}
-                        strokeOpacity={0}
-                        pointerEvents="none"
-                    />
-                    <GridColumns
-                        top={margin.top}
-                        scale={dateScale}
-                        height={innerHeight}
-                        strokeDasharray="1,3"
-                        stroke={accentColor}
-                        strokeOpacity={0.2}
-                        pointerEvents="none"
-                    />
-                    <AreaClosed
-                        data={stock}
-                        x={(d) => dateScale(getDate(d)) ?? 0}
-                        y={(d) => stockValueScale(getStockValue(d)) ?? 0}
-                        yScale={stockValueScale}
-                        strokeWidth={1}
-                        stroke="url(#area-gradient)"
-                        fill="url(#area-gradient)"
-                        curve={curveMonotoneX}
-                    />
-                    <Bar
-                        x={margin.left}
-                        y={margin.top}
-                        width={innerWidth}
-                        height={innerHeight}
-                        fill="transparent"
-                        rx={14}
-                        onTouchStart={handleTooltip}
-                        onTouchMove={handleTooltip}
-                        onMouseMove={handleTooltip}
-                        onMouseLeave={() => hideTooltip()}
-                    />
-                    {tooltipData && (
-                        <g>
-                            <Line
-                                from={{ x: tooltipLeft, y: margin.top }}
-                                to={{ x: tooltipLeft, y: innerHeight + margin.top }}
-                                stroke={accentColorDark}
-                                strokeWidth={2}
-                                pointerEvents="none"
-                                strokeDasharray="5,2"
-                            />
-                            <circle
-                                cx={tooltipLeft}
-                                cy={tooltipTop + 1}
-                                r={4}
-                                fill="black"
-                                fillOpacity={0.1}
-                                stroke="black"
-                                strokeOpacity={0.1}
-                                strokeWidth={2}
-                                pointerEvents="none"
-                            />
-                            <circle
-                                cx={tooltipLeft}
-                                cy={tooltipTop}
-                                r={4}
-                                fill={accentColorDark}
-                                stroke="white"
-                                strokeWidth={2}
-                                pointerEvents="none"
-                            />
-                        </g>
-                    )}
-                </svg>
-                {
-                    tooltipData && (
-                        <div>
-                            <TooltipWithBounds
-                                key={Math.random()}
-                                top={tooltipTop - 12}
-                                left={tooltipLeft + 12}
-                                style={tooltipStyles}
-                            >
-                                {`$${getStockValue(tooltipData)}`}
-                            </TooltipWithBounds>
-                            <Tooltip
-                                top={innerHeight + margin.top - 14}
-                                left={tooltipLeft}
-                                style={{
-                                    ...defaultStyles,
-                                    minWidth: 72,
-                                    textAlign: 'center',
-                                    transform: 'translateX(-50%)',
-                                }}
-                            >
-                                {formatDate(getDate(tooltipData))}
-                            </Tooltip>
-                        </div>
-                    )
+                {/* {(tooltipData) ?
+                    <Legend data={tooltipData} />
+                    :
+                    <></>} */}
+
+                <div style={{ display: 'flex', justifyContent: 'center', width: "100%", position: "relative" }}> <div>
+                    <svg width={1000} height={600} style={{
+
+                        //    display: 'block', margin: 'auto' 
+
+                    }}>
+                        <rect
+                            x={0}
+                            y={0}
+                            width={1000}
+                            height={600}
+                            fill="url(#area-background-gradient)"
+                            rx={14}
+                        />
+                        <LinearGradient id="area-background-gradient" from={background} to={background2} />
+                        <LinearGradient id="area-gradient" from={accentColor} to={accentColor} toOpacity={0.1} />
+                        <GridRows
+                            left={margin.left}
+                            scale={stockValueScale}
+                            width={innerWidth}
+                            strokeDasharray="1,3"
+                            stroke={accentColor}
+                            strokeOpacity={0}
+                            pointerEvents="none"
+                        />
+                        <GridColumns
+                            top={margin.top}
+                            scale={dateScale}
+                            height={innerHeight}
+                            strokeDasharray="1,3"
+                            stroke={accentColor}
+                            strokeOpacity={0.2}
+                            pointerEvents="none"
+                        />
+                        <AreaClosed
+                            data={stock}
+                            x={(d) => dateScale(getDate(d)) ?? 0}
+                            y={(d) => stockValueScale(getStockValue(d)) ?? 0}
+                            yScale={stockValueScale}
+                            strokeWidth={1}
+                            stroke="url(#area-gradient)"
+                            fill="url(#area-gradient)"
+                            curve={curveMonotoneX}
+                        />
+                        <Bar
+                            x={margin.left}
+                            y={margin.top}
+                            width={innerWidth}
+                            height={innerHeight}
+                            fill="transparent"
+                            rx={14}
+                            onTouchStart={handleTooltip}
+                            onTouchMove={handleTooltip}
+                            onMouseMove={handleTooltip}
+                            onMouseLeave={() => hideTooltip()}
+                        />
+                        {tooltipData && (
+                            <g>
+                                <Line
+                                    from={{ x: tooltipLeft, y: margin.top }}
+                                    to={{ x: tooltipLeft, y: innerHeight + margin.top }}
+                                    stroke={accentColorDark}
+                                    strokeWidth={2}
+                                    pointerEvents="none"
+                                    strokeDasharray="5,2"
+                                />
+                                <circle
+                                    cx={tooltipLeft}
+                                    cy={tooltipTop + 1}
+                                    r={4}
+                                    fill="black"
+                                    fillOpacity={0.1}
+                                    stroke="black"
+                                    strokeOpacity={0.1}
+                                    strokeWidth={2}
+                                    pointerEvents="none"
+                                />
+                                <circle
+                                    cx={tooltipLeft}
+                                    cy={tooltipTop}
+                                    r={4}
+                                    fill={accentColorDark}
+                                    stroke="white"
+                                    strokeWidth={2}
+                                    pointerEvents="none"
+                                />
 
 
-                }
-            </div >
+                            </g>
+                        )}
+                    </svg>
+                    <div style={{ display: "flex", justifyContent: "center" }}>
+                        {
+                            (tooltipData) && (
+                                <div>
+                                    <TooltipWithBounds
+                                        key={Math.random()}
+                                        top={tooltipTop - 12}
+                                        left={mousePosition.x}
+                                        style={tooltipStyles}
+                                    >
+                                        {`$${getStockValue(tooltipData)}`}
+                                    </TooltipWithBounds>
+                                    <Tooltip
+                                        top={innerHeight + margin.top - 14}
+                                        left={mousePosition.x}
+                                        style={{
+                                            ...defaultStyles,
+                                            minWidth: 72,
+                                            textAlign: 'center',
+                                            transform: 'translateX(-50%)',
+                                        }}
+                                    >
+                                        {formatDate(getDate(tooltipData))}
+                                    </Tooltip>
+                                </div>
+                            )
 
 
+                        }
+                    </div>
+                </div>
+
+                </div >
+
+            </div>
         );
     },
 );
