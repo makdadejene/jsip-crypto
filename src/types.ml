@@ -97,7 +97,7 @@ module Date = struct
       ; month : int
       ; day : int
       }
-    [@@deriving compare, sexp]
+    [@@deriving equal, compare, sexp]
   end
 
   include T

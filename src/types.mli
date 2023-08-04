@@ -51,7 +51,7 @@ module Date : sig
     ; month : int
     ; day : int
     }
-  [@@deriving compare, sexp_of]
+  [@@deriving equal, compare, sexp_of]
 
   val create : string -> t
   val time_to_unix : t -> float
