@@ -44,9 +44,9 @@ let test_ar_graph () =
       ~color:`Black
       [ (let unix_date =
            Date.time_to_unix
-             (Auto_regressor.Prediction.date prediction)
+             (Prediction.date prediction)
          in
-         let price = Auto_regressor.Prediction.prediction prediction in
+         let price = Prediction.prediction prediction in
          unix_date, price)
       ]
   in
@@ -57,7 +57,7 @@ let test_ar_graph () =
   (* Gp.plot gp ~output:(Gp.Output.create (`Png
      "autoregressor_predictor_test.png")) data_points_series; *)
   Gp.close gp;
-  print_s [%message (prediction : Auto_regressor.Prediction.t)]
+  print_s [%message (prediction : Prediction.t)]
 ;;
 
 let test_mvg_graph () =
@@ -112,9 +112,9 @@ let test_mvg_graph () =
       ~color:`Magenta
       [ (let unix_date =
            Date.time_to_unix
-             (Auto_regressor.Prediction.date prediction)
+             (Prediction.date prediction)
          in
-         let price = Auto_regressor.Prediction.prediction prediction in
+         let price = Prediction.prediction prediction in
          unix_date, price)
       ]
   in
@@ -124,7 +124,7 @@ let test_mvg_graph () =
       (Gp.Output.create (`Png "mvg_predictor_large_window_large_q.png"))
     [ data_points_series; mvg_data_points_series; prediction_series ];
   Gp.close gp;
-  print_s [%message (prediction : Auto_regressor.Prediction.t)]
+  print_s [%message (prediction : Prediction.t)]
 ;;
 
 let test_simple_graph () =
@@ -161,9 +161,9 @@ let test_simple_graph () =
       ~color:`Magenta
       [ (let unix_date =
            Date.time_to_unix
-             (Auto_regressor.Prediction.date prediction)
+             (Prediction.date prediction)
          in
-         let price = Auto_regressor.Prediction.prediction prediction in
+         let price = Prediction.prediction prediction in
          unix_date, price)
       ]
   in
@@ -172,7 +172,7 @@ let test_simple_graph () =
     ~output:(Gp.Output.create (`Png "arima_predictor_test.png"))
     [ data_points_series; prediction_series ];
   Gp.close gp;
-  print_s [%message (prediction : Auto_regressor.Prediction.t)]
+  print_s [%message (prediction : Prediction.t)]
 ;;
 
 let visualize_command =

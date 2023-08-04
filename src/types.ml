@@ -327,6 +327,62 @@ module Total_Data = struct
   include Comparable.Make (T)
 end
 
+module Prediction = struct
+  type t =
+    { date : Date.t
+    ; prediction : float
+    }
+  [@@deriving sexp_of]
+
+  let date t = t.date
+  let prediction t = t.prediction
+  let create date prediction = { date; prediction }
+
+  let average_predictions
+    ~first_prediction
+    ~second_prediction
+    ~(prediction_coeff : float)
+    =
+    if (not Float.(0. <=. prediction_coeff))
+       && Float.(prediction_coeff <. 1.)
+    then failwith "prediction coeffcient must be in [0,1]"
+    else if not (Date.equal (date first_prediction) (date second_prediction))
+    then failwith "predictions must happen on the same day"
+    else (
+      let prediction =
+        (prediction first_prediction *. prediction_coeff)
+        +. (prediction second_prediction *. (1. -. prediction_coeff))
+      in
+      { date = date first_prediction; prediction })
+  ;;
+end
+
+module Model = struct
+  type t =
+    { mutable weight : float
+    ; mutable bias : float
+    }
+  [@@deriving sexp_of, fields ~getters]
+
+  let create () = { weight = 0.; bias = 0. }
+  let linear_regression_function = Linear_regression.ordinary_least_squares
+
+  let fit t (data : Total_Data.t) =
+    let dataset = Total_Data.get_all_dates_prices data () in
+    let dataset =
+      List.map dataset ~f:(fun data_tuple ->
+        Date.time_to_unix (fst data_tuple), snd data_tuple)
+    in
+    let weight, bias = linear_regression_function dataset in
+    t.weight <- weight;
+    t.bias <- bias
+  ;;
+
+  let predict t ~x_val =
+    Linear_regression.predict ~weight:(weight t) ~bias:(bias t) ~x_val
+  ;;
+end
+
 let%expect_test "unix_1" =
   let current_date = Date.create "2000-01-01" in
   let to_unix = Date.time_to_unix current_date in

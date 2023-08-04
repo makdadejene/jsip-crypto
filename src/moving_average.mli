@@ -27,5 +27,5 @@ module MovingAverageModel : sig
     -> int
     -> (Types.Date.t * float) list
 
-  val predict_next_price : t -> Auto_regressor.Prediction.t
+  val predict_next_price : t -> Types.Prediction.t
 end

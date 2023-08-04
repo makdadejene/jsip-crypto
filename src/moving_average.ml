@@ -33,32 +33,33 @@ module MovingAverageModel = struct
       List.fold
         days_list
         ~init:[]
-        ~f:(fun
-             result_list
-             { date
-             ; open_ = _open
-             ; high = _hig
-             ; low = _lo
-             ; close = clo
-             ; volume = _vol
-             }
-           -> result_list @ [ date, clo ])
+        ~f:
+          (fun
+            result_list
+            { date
+            ; open_ = _open
+            ; high = _hig
+            ; low = _lo
+            ; close = clo
+            ; volume = _vol
+            }
+          -> result_list @ [ date, clo ])
     in
     List.foldi
       close_list
       ~init:[]
       ~f:(fun index_orig result (date, _close_val) ->
-      if index_orig >= range - 1
-      then (
-        let curr_range =
-          List.slice close_list (index_orig - (range - 1)) (index_orig + 1)
-        in
-        let sum =
-          List.fold curr_range ~init:0.0 ~f:(fun sum (_date, value) ->
-            sum +. value)
-        in
-        result @ [ date, sum /. Int.to_float range ])
-      else [])
+        if index_orig >= range - 1
+        then (
+          let curr_range =
+            List.slice close_list (index_orig - (range - 1)) (index_orig + 1)
+          in
+          let sum =
+            List.fold curr_range ~init:0.0 ~f:(fun sum (_date, value) ->
+              sum +. value)
+          in
+          result @ [ date, sum /. Int.to_float range ])
+        else [])
   ;;
 
   let predict_next_price t =
@@ -66,20 +67,16 @@ module MovingAverageModel = struct
       get_moving_avgs (dataset t) (moving_avereage_window t)
     in
     let crypto = Total_Data.crypto (dataset t) in
-    let dataset =
-      Total_Data.create_from_date_price crypto moving_averages
-    in
+    let dataset = Total_Data.create_from_date_price crypto moving_averages in
     let training_dataset =
       Total_Data.last_n_days_dataset dataset ~num_of_days:(q t)
     in
-    let model = Auto_regressor.Model.create () in
+    let model = Model.create () in
     let next_date = Total_Data.next_day_date training_dataset in
     let next_date_unix = Date.time_to_unix next_date in
-    Auto_regressor.Model.fit model training_dataset;
-    let prediction =
-      Auto_regressor.Model.predict model ~x_val:next_date_unix
-    in
-    Auto_regressor.Prediction.create next_date prediction
+    Model.fit model training_dataset;
+    let prediction = Model.predict model ~x_val:next_date_unix in
+    Prediction.create next_date prediction
   ;;
 end
 
@@ -153,7 +150,7 @@ let%expect_test "mvg_predictor_default" =
   Total_Data.add_days_data total_data days2;
   let model = MovingAverageModel.create ~dataset:total_data () in
   let prediction = MovingAverageModel.predict_next_price model in
-  print_s [%message (prediction : Auto_regressor.Prediction.t)];
+  print_s [%message (prediction : Prediction.t)];
   [%expect
     {|
     (prediction ((date ((year 2022) (month 7) (day 30))) (prediction 2)))|}]
@@ -192,7 +189,7 @@ let%expect_test "mvg_predictor_large_window_large_q" =
       (List.map
          (Total_Data.get_all_dates_prices total_data ())
          ~f:(fun data_tuple ->
-         Date.time_to_unix (fst data_tuple), snd data_tuple))
+           Date.time_to_unix (fst data_tuple), snd data_tuple))
   in
   let mvg_data_points_series =
     Gp.Series.lines_xy
@@ -207,11 +204,8 @@ let%expect_test "mvg_predictor_large_window_large_q" =
   let prediction_series =
     Gp.Series.points_xy
       ~color:`Magenta
-      [ (let unix_date =
-           Date.time_to_unix
-             (Auto_regressor.Prediction.date prediction)
-         in
-         let price = Auto_regressor.Prediction.prediction prediction in
+      [ (let unix_date = Date.time_to_unix (Prediction.date prediction) in
+         let price = Prediction.prediction prediction in
          price, unix_date)
       ]
   in
@@ -221,7 +215,7 @@ let%expect_test "mvg_predictor_large_window_large_q" =
       (Gp.Output.create (`Png "mvg_predictor_large_window_large_q.png"))
     [ data_points_series; mvg_data_points_series; prediction_series ];
   Gp.close gp;
-  print_s [%message (prediction : Auto_regressor.Prediction.t)];
+  print_s [%message (prediction : Prediction.t)];
   [%expect
     {|
     (prediction

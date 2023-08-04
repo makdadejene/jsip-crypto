@@ -86,9 +86,7 @@ let%expect_test "simple_model_test" =
   let prediction_series =
     Gp.Series.points_xy
       ~color:`Magenta
-      [ (let unix_date =
-           Date.time_to_unix (Prediction.date prediction)
-         in
+      [ (let unix_date = Date.time_to_unix (Prediction.date prediction) in
          let price = Prediction.prediction prediction in
          price, unix_date)
       ]

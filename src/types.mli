@@ -128,3 +128,35 @@ module Total_Data : sig
   val next_day_date : t -> Date.t
   val last_n_days_dataset : t -> num_of_days:int -> t
 end
+
+module Prediction : sig
+  type t =
+    { date : Date.t
+    ; prediction : float
+    }
+
+  val sexp_of_t : t -> Sexplib0.Sexp.t
+  val prediction : t -> float
+  val date : t -> Date.t
+  val create : Date.t -> float -> t
+
+  val average_predictions
+    :  first_prediction:t
+    -> second_prediction:t
+    -> prediction_coeff:float
+    -> t
+end
+
+module Model : sig
+  type t =
+    { mutable weight : float
+    ; mutable bias : float
+    }
+
+  val create : unit -> t
+  val weight : t -> float
+  val bias : t -> float
+  val linear_regression_function : (float * float) list -> float * float
+  val fit : t -> Total_Data.t -> unit
+  val predict : t -> x_val:float -> float
+end
