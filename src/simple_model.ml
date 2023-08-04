@@ -1,13 +1,14 @@
 open! Core
 open! Auto_regressor
 open! Moving_average
+open! Types
 
 module ArimaModel = struct
   type t =
     { mutable ar_model : AutoRegressor.t
     ; mutable weighted_average : float
     ; mutable mvg_model : MovingAverageModel.t
-    ; mutable full_dataset : Types.Total_Data.t
+    ; mutable full_dataset : Total_Data.t
     ; mutable predictions : Prediction.t list
     }
   [@@deriving sexp_of, fields ~getters]
@@ -41,12 +42,12 @@ module ArimaModel = struct
   let graph_points t =
     let dataset_points =
       List.map
-        (Types.Total_Data.get_all_dates_prices (full_dataset t) ())
-        ~f:(fun (date, price) -> Types.Date.to_string date, price)
+        (Total_Data.get_all_dates_prices (full_dataset t) ())
+        ~f:(fun (date, price) -> Date.to_string date, price)
     in
     let prediction_points =
       List.map (predictions t) ~f:(fun prediction ->
-        ( Types.Date.to_string (Prediction.date prediction)
+        ( Date.to_string (Prediction.date prediction)
         , Prediction.prediction prediction ))
     in
     dataset_points, prediction_points
@@ -54,23 +55,23 @@ module ArimaModel = struct
 end
 
 let%expect_test "simple_model_test" =
-  let total_data = Types.Total_Data.create Types.Crypto.Bitcoin in
+  let total_data = Total_Data.create Crypto.Bitcoin in
   let days1 =
     List.init 9 ~f:(fun int ->
-      Types.Day_Data.create
+      Day_Data.create
         ~date:("2022-07-1" ^ Int.to_string (int + 1))
         ~close:(Int.to_float (int + 1))
         ())
   in
   let days2 =
     List.init 10 ~f:(fun int ->
-      Types.Day_Data.create
+      Day_Data.create
         ~date:("2022-07-2" ^ Int.to_string int)
         ~close:(Int.to_float (10 - int))
         ())
   in
-  Types.Total_Data.add_days_data total_data days1;
-  Types.Total_Data.add_days_data total_data days2;
+  Total_Data.add_days_data total_data days1;
+  Total_Data.add_days_data total_data days2;
   let model = ArimaModel.create ~dataset:total_data () in
   let prediction = ArimaModel.predict_next_price model in
   let gp = Gp.create () in
@@ -78,15 +79,15 @@ let%expect_test "simple_model_test" =
     Gp.Series.lines_xy
       ~color:`Green
       (List.map
-         (Types.Total_Data.get_all_dates_prices total_data ())
+         (Total_Data.get_all_dates_prices total_data ())
          ~f:(fun data_tuple ->
-           Types.Date.time_to_unix (fst data_tuple), snd data_tuple))
+           Date.time_to_unix (fst data_tuple), snd data_tuple))
   in
   let prediction_series =
     Gp.Series.points_xy
       ~color:`Magenta
       [ (let unix_date =
-           Types.Date.time_to_unix (Prediction.date prediction)
+           Date.time_to_unix (Prediction.date prediction)
          in
          let price = Prediction.prediction prediction in
          price, unix_date)

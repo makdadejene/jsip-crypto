@@ -1,4 +1,4 @@
-open Core
+open! Core
 
 module Crypto = struct
   module T = struct

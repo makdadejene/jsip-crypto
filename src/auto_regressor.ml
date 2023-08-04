@@ -1,10 +1,11 @@
 open! Core
 open! Owl_base
+open! Types
 module Gp = Gnuplot
 
 module Prediction = struct
   type t =
-    { date : Types.Date.t
+    { date : Date.t
     ; prediction : float
     }
   [@@deriving sexp_of]
@@ -21,10 +22,7 @@ module Prediction = struct
     if (not Float.(0. <=. prediction_coeff))
        && Float.(prediction_coeff <. 1.)
     then failwith "prediction coeffcient must be in [0,1]"
-    else if not
-              (Types.Date.equal
-                 (date first_prediction)
-                 (date second_prediction))
+    else if not (Date.equal (date first_prediction) (date second_prediction))
     then failwith "predictions must happen on the same day"
     else (
       let prediction =
@@ -45,11 +43,11 @@ module Model = struct
   let create () = { weight = 0.; bias = 0. }
   let linear_regression_function = Linear_regression.ordinary_least_squares
 
-  let fit t (data : Types.Total_Data.t) =
-    let dataset = Types.Total_Data.get_all_dates_prices data () in
+  let fit t (data : Total_Data.t) =
+    let dataset = Total_Data.get_all_dates_prices data () in
     let dataset =
       List.map dataset ~f:(fun data_tuple ->
-        Types.Date.time_to_unix (fst data_tuple), snd data_tuple)
+        Date.time_to_unix (fst data_tuple), snd data_tuple)
     in
     let weight, bias = linear_regression_function dataset in
     t.weight <- weight;
@@ -64,7 +62,7 @@ end
 module AutoRegressor = struct
   type t =
     { mutable p : int
-    ; mutable dataset : Types.Total_Data.t
+    ; mutable dataset : Total_Data.t
     }
   [@@deriving sexp_of, fields ~getters]
 
@@ -74,10 +72,10 @@ module AutoRegressor = struct
 
   let predict_next_price t =
     let training_dataset =
-      Types.Total_Data.last_n_days_dataset (dataset t) ~num_of_days:(p t)
+      Total_Data.last_n_days_dataset (dataset t) ~num_of_days:(p t)
     in
-    let next_date = Types.Total_Data.next_day_date training_dataset in
-    let next_date_unix = Types.Date.time_to_unix next_date in
+    let next_date = Total_Data.next_day_date training_dataset in
+    let next_date_unix = Date.time_to_unix next_date in
     let model = Model.create () in
     Model.fit model training_dataset;
     let prediction = Model.predict model ~x_val:next_date_unix in
@@ -86,15 +84,15 @@ module AutoRegressor = struct
 end
 
 let%expect_test "predict_next_price" =
-  let total_data = Types.Total_Data.create Types.Crypto.Bitcoin in
+  let total_data = Total_Data.create Crypto.Bitcoin in
   let days =
     List.init 10 ~f:(fun int ->
-      Types.Day_Data.create
+      Day_Data.create
         ~date:("2022-07-2" ^ Int.to_string int)
         ~close:(Int.to_float int)
         ())
   in
-  Types.Total_Data.add_days_data total_data days;
+  Total_Data.add_days_data total_data days;
   let autoregressor_model = AutoRegressor.create ~dataset:total_data () in
   let predicted_price =
     AutoRegressor.predict_next_price autoregressor_model
