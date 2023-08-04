@@ -98,12 +98,12 @@ export default withTooltip(
 
         return (
             <div>
-                <svg width={width} height={height}>
+                <svg width={1000} height={600}>
                     <rect
                         x={0}
                         y={0}
-                        width={width}
-                        height={height}
+                        width={1000}
+                        height={600}
                         fill="url(#area-background-gradient)"
                         rx={14}
                     />

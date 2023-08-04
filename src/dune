@@ -13,4 +13,4 @@
  (inline_tests
   (deps ./data/btc_data.txt))
  (preprocess
-  (pps ppx_jane pps ppx_deriving_yojson)))
+  (pps ppx_jane ppx_deriving_yojson)))
