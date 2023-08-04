@@ -97,7 +97,7 @@ module Date = struct
       ; month : int
       ; day : int
       }
-    [@@deriving equal, compare, sexp]
+    [@@deriving equal, compare, sexp, fields ~getters]
   end
 
   include T
@@ -140,6 +140,11 @@ module Date = struct
     |> Time_ns.Span.of_int_sec
     |> Time_ns.of_span_since_epoch
     |> Time_ns.to_string_utc
+  ;;
+
+  let to_string t =
+    let day, month, year = day t, month t, year t in
+    Int.to_string month ^ "-" ^ Int.to_string day ^ "-" ^ Int.to_string year
   ;;
 
   let%expect_test _ =
@@ -226,6 +231,7 @@ module Day_Data = struct
     ()
     =
     { date; open_; high; low; close; volume }
+  ;;
 
   let get_date t = t.date
   let get_open_ t = t.open_
@@ -355,6 +361,14 @@ let%expect_test "next_date3" =
   let next_date = Date.next_date { Date.year = 1900; month = 2; day = 28 } in
   print_s [%message (next_date : Date.t)];
   [%expect {| (next_date ((year 1900) (month 3) (day 1))) |}]
+;;
+
+let%expect_test "date_to_string" =
+  let date_string =
+    Date.to_string { Date.year = 1900; month = 2; day = 28 }
+  in
+  print_s [%message (date_string : string)];
+  [%expect {| (date_string 2-28-1900) |}]
 ;;
 
 let%expect_test "get_all_dates_prices1" =

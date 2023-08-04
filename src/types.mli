@@ -56,6 +56,10 @@ module Date : sig
   val create : string -> t
   val time_to_unix : t -> float
   val unix_to_time : string -> string
+  val day : t -> int
+  val month : t -> int
+  val year : t -> int
+  val to_string : t -> string
 end
 
 module Day_Data : sig

@@ -16,18 +16,6 @@ module Prediction : sig
     -> t
 end
 
-module Hyperparameters : sig
-  type t =
-    { constant_term : int
-    ; regression_of_previous_val : int
-    ; model_residual : int
-    }
-
-  val get_constant_term : t -> int
-  val get_regression_of_previous_val : t -> int
-  val get_model_residual : t -> int
-end
-
 module Model : sig
   type t =
     { mutable weight : float

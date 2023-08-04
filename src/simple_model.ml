@@ -11,6 +11,7 @@ module ArimaModel = struct
     ; mutable weighted_average : float
     ; mutable mvg_model : MovingAverageModel.t
     ; mutable full_dataset : Types.Total_Data.t
+    ; mutable predictions : Prediction.t list
     }
   [@@deriving sexp_of, fields ~getters]
 
@@ -28,6 +29,20 @@ module ArimaModel = struct
       ~first_prediction:ar_model_prediction
       ~second_prediction:mvg_model_prediction
       ~prediction_coeff:(weighted_average t)
+  ;;
+
+  let graph_points t =
+    let dataset_points =
+      List.map
+        (Types.Total_Data.get_all_dates_prices (full_dataset t) ())
+        ~f:(fun (date, price) -> Types.Date.to_string date, price)
+    in
+    let prediction_points =
+      List.map (predictions t) ~f:(fun prediction ->
+        ( Types.Date.to_string (Prediction.date prediction)
+        , Prediction.prediction prediction ))
+    in
+    dataset_points, prediction_points
   ;;
 end
 
