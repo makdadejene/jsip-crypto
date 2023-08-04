@@ -3,11 +3,20 @@ open! Jsonaf_kernel
 open Async_kernel
 module Server = Cohttp_async.Server
 
+module Crypto_Data = struct
+  type t =
+    { time_actual : float array
+    ; time_predict : float array
+    ; data_actual : float array
+    ; data_predict : float array
+    }
+end
+
 let handler ~body:_ _sock req =
   let uri = Cohttp.Request.uri req in
   let request = Uri.path uri |> String.split ~on:'/' in
   match request with
-  | [ coin; year ] ->
+  | [ coin; start_date; end_date ] ->
     let response = [%string "beep boop %{coin} %{year}"] in
     Server.respond_string response
   | _ -> Server.respond_string ~status:`Not_found "Route not found"
