@@ -1,11 +1,12 @@
 open! Core
+open! Types
 module Gp = Gnuplot
 
 module MovingAverageModel = struct
   type t =
     { mutable q : int
     ; mutable moving_average_window : int
-    ; mutable dataset : Types.Total_Data.t
+    ; mutable dataset : Total_Data.t
     }
   [@@deriving sexp_of]
 
@@ -24,7 +25,7 @@ module MovingAverageModel = struct
 
   let update_dateset t ~new_dataset = t.dataset <- new_dataset
 
-  let get_moving_avgs (crypto_data : Types.Total_Data.t) (range : int) =
+  let get_moving_avgs (crypto_data : Total_Data.t) (range : int) =
     let days_list =
       match crypto_data with { crypto = _c; days = d } -> d
     in
@@ -32,70 +33,67 @@ module MovingAverageModel = struct
       List.fold
         days_list
         ~init:[]
-        ~f:(fun
-             result_list
-             { date
-             ; open_ = _open
-             ; high = _hig
-             ; low = _lo
-             ; close = clo
-             ; volume = _vol
-             }
-           -> result_list @ [ date, clo ])
+        ~f:
+          (fun
+            result_list
+            { date
+            ; open_ = _open
+            ; high = _hig
+            ; low = _lo
+            ; close = clo
+            ; volume = _vol
+            }
+          -> result_list @ [ date, clo ])
     in
     List.foldi
       close_list
       ~init:[]
       ~f:(fun index_orig result (date, _close_val) ->
-      if index_orig >= range - 1
-      then (
-        let curr_range =
-          List.slice close_list (index_orig - (range - 1)) (index_orig + 1)
-        in
-        let sum =
-          List.fold curr_range ~init:0.0 ~f:(fun sum (_date, value) ->
-            sum +. value)
-        in
-        result @ [ date, sum /. Int.to_float range ])
-      else [])
+        if index_orig >= range - 1
+        then (
+          let curr_range =
+            List.slice close_list (index_orig - (range - 1)) (index_orig + 1)
+          in
+          let sum =
+            List.fold curr_range ~init:0.0 ~f:(fun sum (_date, value) ->
+              sum +. value)
+          in
+          result @ [ date, sum /. Int.to_float range ])
+        else [])
   ;;
 
   let predict_next_price t =
     let moving_averages =
       get_moving_avgs (dataset t) (moving_avereage_window t)
     in
-    let crypto = Types.Total_Data.crypto (dataset t) in
-    let dataset =
-      Types.Total_Data.create_from_date_price crypto moving_averages
-    in
+    let crypto = Total_Data.crypto (dataset t) in
+    let dataset = Total_Data.create_from_date_price crypto moving_averages in
     let training_dataset =
-      Types.Total_Data.last_n_days_dataset dataset ~num_of_days:(q t)
+      Total_Data.last_n_days_dataset dataset ~num_of_days:(q t)
     in
-    let model = Auto_regressor.Model.create () in
-    let next_date = Types.Total_Data.next_day_date training_dataset in
-    let next_date_unix = Types.Date.time_to_unix next_date in
-    Auto_regressor.Model.fit model training_dataset;
-    let prediction =
-      Auto_regressor.Model.predict model ~x_val:next_date_unix
-    in
-    Auto_regressor.Prediction.create next_date prediction
+    let model = Model.create () in
+    let next_date = Total_Data.next_day_date training_dataset in
+    let next_date_unix = Date.time_to_unix next_date in
+    Model.fit model training_dataset;
+    let prediction = Model.predict model ~x_val:next_date_unix in
+    Prediction.create next_date prediction
   ;;
 end
 
 let%expect_test "mvg_test1" =
-  let total_data = Types.Total_Data.create Types.Crypto.Bitcoin in
+  let total_data = Total_Data.create Crypto.Bitcoin in
   let days =
     List.init 10 ~f:(fun int ->
-      Types.Day_Data.create
+      Day_Data.create
         ~date:("2022-07-2" ^ Int.to_string int)
         ~close:(Int.to_float int)
         ())
   in
-  Types.Total_Data.add_days_data total_data days;
+  Total_Data.add_days_data total_data days;
   let moving_average_test =
     MovingAverageModel.get_moving_avgs total_data 2
   in
-  print_s [%message (moving_average_test : (Types.Date.t * float) list)];
+  print_s [%message (moving_average_test : (Date.t * float) list)];
   [%expect
     {|
     (moving_average_test
@@ -111,19 +109,19 @@ let%expect_test "mvg_test1" =
 ;;
 
 let%expect_test "mvg_test2" =
-  let total_data = Types.Total_Data.create Types.Crypto.Bitcoin in
-  let day1 = Types.Day_Data.create ~date:"2022-07-29" ~close:1.5 () in
-  let day2 = Types.Day_Data.create ~date:"2022-07-30" ~close:2.45 () in
-  let day3 = Types.Day_Data.create ~date:"2022-07-31" ~close:3.23 () in
-  let day4 = Types.Day_Data.create ~date:"2022-08-1" ~close:4.87 () in
-  Types.Total_Data.add_day_data total_data day1;
-  Types.Total_Data.add_day_data total_data day2;
-  Types.Total_Data.add_day_data total_data day3;
-  Types.Total_Data.add_day_data total_data day4;
+  let total_data = Total_Data.create Crypto.Bitcoin in
+  let day1 = Day_Data.create ~date:"2022-07-29" ~close:1.5 () in
+  let day2 = Day_Data.create ~date:"2022-07-30" ~close:2.45 () in
+  let day3 = Day_Data.create ~date:"2022-07-31" ~close:3.23 () in
+  let day4 = Day_Data.create ~date:"2022-08-1" ~close:4.87 () in
+  Total_Data.add_day_data total_data day1;
+  Total_Data.add_day_data total_data day2;
+  Total_Data.add_day_data total_data day3;
+  Total_Data.add_day_data total_data day4;
   let moving_average_test =
     MovingAverageModel.get_moving_avgs total_data 2
   in
-  print_s [%message (moving_average_test : (Types.Date.t * float) list)];
+  print_s [%message (moving_average_test : (Date.t * float) list)];
   [%expect
     {|
     (moving_average_test
@@ -133,49 +131,49 @@ let%expect_test "mvg_test2" =
 ;;
 
 let%expect_test "mvg_predictor_default" =
-  let total_data = Types.Total_Data.create Types.Crypto.Bitcoin in
+  let total_data = Total_Data.create Crypto.Bitcoin in
   let days1 =
     List.init 9 ~f:(fun int ->
-      Types.Day_Data.create
+      Day_Data.create
         ~date:("2022-07-1" ^ Int.to_string (int + 1))
         ~close:(Int.to_float (int + 1))
         ())
   in
   let days2 =
     List.init 10 ~f:(fun int ->
-      Types.Day_Data.create
+      Day_Data.create
         ~date:("2022-07-2" ^ Int.to_string int)
         ~close:(Int.to_float (10 - int))
         ())
   in
-  Types.Total_Data.add_days_data total_data days1;
-  Types.Total_Data.add_days_data total_data days2;
+  Total_Data.add_days_data total_data days1;
+  Total_Data.add_days_data total_data days2;
   let model = MovingAverageModel.create ~dataset:total_data () in
   let prediction = MovingAverageModel.predict_next_price model in
-  print_s [%message (prediction : Auto_regressor.Prediction.t)];
+  print_s [%message (prediction : Prediction.t)];
   [%expect
     {|
     (prediction ((date ((year 2022) (month 7) (day 30))) (prediction 2)))|}]
 ;;
 
 let%expect_test "mvg_predictor_large_window_large_q" =
-  let total_data = Types.Total_Data.create Types.Crypto.Bitcoin in
+  let total_data = Total_Data.create Crypto.Bitcoin in
   let days1 =
     List.init 9 ~f:(fun int ->
-      Types.Day_Data.create
+      Day_Data.create
         ~date:("2022-07-1" ^ Int.to_string (int + 1))
         ~close:(Int.to_float (int + 1))
         ())
   in
   let days2 =
     List.init 10 ~f:(fun int ->
-      Types.Day_Data.create
+      Day_Data.create
         ~date:("2022-07-2" ^ Int.to_string int)
         ~close:(Int.to_float (10 - int))
         ())
   in
-  Types.Total_Data.add_days_data total_data days1;
-  Types.Total_Data.add_days_data total_data days2;
+  Total_Data.add_days_data total_data days1;
+  Total_Data.add_days_data total_data days2;
   let model =
     MovingAverageModel.create
       ~dataset:total_data
@@ -189,9 +187,9 @@ let%expect_test "mvg_predictor_large_window_large_q" =
     Gp.Series.lines_xy
       ~color:`Green
       (List.map
-         (Types.Total_Data.get_all_dates_prices total_data ())
+         (Total_Data.get_all_dates_prices total_data ())
          ~f:(fun data_tuple ->
-         Types.Date.time_to_unix (fst data_tuple), snd data_tuple))
+           Date.time_to_unix (fst data_tuple), snd data_tuple))
   in
   let mvg_data_points_series =
     Gp.Series.lines_xy
@@ -201,16 +199,13 @@ let%expect_test "mvg_predictor_large_window_large_q" =
             total_data
             (MovingAverageModel.moving_avereage_window model))
          ~f:(fun data_tuple ->
-           Types.Date.time_to_unix (fst data_tuple), snd data_tuple))
+           Date.time_to_unix (fst data_tuple), snd data_tuple))
   in
   let prediction_series =
     Gp.Series.points_xy
       ~color:`Magenta
-      [ (let unix_date =
-           Types.Date.time_to_unix
-             (Auto_regressor.Prediction.date prediction)
-         in
-         let price = Auto_regressor.Prediction.prediction prediction in
+      [ (let unix_date = Date.time_to_unix (Prediction.date prediction) in
+         let price = Prediction.prediction prediction in
          price, unix_date)
       ]
   in
@@ -220,7 +215,7 @@ let%expect_test "mvg_predictor_large_window_large_q" =
       (Gp.Output.create (`Png "mvg_predictor_large_window_large_q.png"))
     [ data_points_series; mvg_data_points_series; prediction_series ];
   Gp.close gp;
-  print_s [%message (prediction : Auto_regressor.Prediction.t)];
+  print_s [%message (prediction : Prediction.t)];
   [%expect
     {|
     (prediction

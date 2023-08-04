@@ -1,4 +1,4 @@
-open Core
+open! Core
 
 module Crypto = struct
   module T = struct
@@ -97,7 +97,7 @@ module Date = struct
       ; month : int
       ; day : int
       }
-    [@@deriving equal, compare, sexp]
+    [@@deriving equal, compare, sexp, fields ~getters]
   end
 
   include T
@@ -140,6 +140,11 @@ module Date = struct
     |> Time_ns.Span.of_int_sec
     |> Time_ns.of_span_since_epoch
     |> Time_ns.to_string_utc
+  ;;
+
+  let to_string t =
+    let day, month, year = day t, month t, year t in
+    Int.to_string month ^ "-" ^ Int.to_string day ^ "-" ^ Int.to_string year
   ;;
 
   let%expect_test _ =
@@ -226,6 +231,7 @@ module Day_Data = struct
     ()
     =
     { date; open_; high; low; close; volume }
+  ;;
 
   let get_date t = t.date
   let get_open_ t = t.open_
@@ -321,6 +327,62 @@ module Total_Data = struct
   include Comparable.Make (T)
 end
 
+module Prediction = struct
+  type t =
+    { date : Date.t
+    ; prediction : float
+    }
+  [@@deriving sexp_of]
+
+  let date t = t.date
+  let prediction t = t.prediction
+  let create date prediction = { date; prediction }
+
+  let average_predictions
+    ~first_prediction
+    ~second_prediction
+    ~(prediction_coeff : float)
+    =
+    if (not Float.(0. <=. prediction_coeff))
+       && Float.(prediction_coeff <. 1.)
+    then failwith "prediction coeffcient must be in [0,1]"
+    else if not (Date.equal (date first_prediction) (date second_prediction))
+    then failwith "predictions must happen on the same day"
+    else (
+      let prediction =
+        (prediction first_prediction *. prediction_coeff)
+        +. (prediction second_prediction *. (1. -. prediction_coeff))
+      in
+      { date = date first_prediction; prediction })
+  ;;
+end
+
+module Model = struct
+  type t =
+    { mutable weight : float
+    ; mutable bias : float
+    }
+  [@@deriving sexp_of, fields ~getters]
+
+  let create () = { weight = 0.; bias = 0. }
+  let linear_regression_function = Linear_regression.ordinary_least_squares
+
+  let fit t (data : Total_Data.t) =
+    let dataset = Total_Data.get_all_dates_prices data () in
+    let dataset =
+      List.map dataset ~f:(fun data_tuple ->
+        Date.time_to_unix (fst data_tuple), snd data_tuple)
+    in
+    let weight, bias = linear_regression_function dataset in
+    t.weight <- weight;
+    t.bias <- bias
+  ;;
+
+  let predict t ~x_val =
+    Linear_regression.predict ~weight:(weight t) ~bias:(bias t) ~x_val
+  ;;
+end
+
 let%expect_test "unix_1" =
   let current_date = Date.create "2000-01-01" in
   let to_unix = Date.time_to_unix current_date in
@@ -355,6 +417,14 @@ let%expect_test "next_date3" =
   let next_date = Date.next_date { Date.year = 1900; month = 2; day = 28 } in
   print_s [%message (next_date : Date.t)];
   [%expect {| (next_date ((year 1900) (month 3) (day 1))) |}]
+;;
+
+let%expect_test "date_to_string" =
+  let date_string =
+    Date.to_string { Date.year = 1900; month = 2; day = 28 }
+  in
+  print_s [%message (date_string : string)];
+  [%expect {| (date_string 2-28-1900) |}]
 ;;
 
 let%expect_test "get_all_dates_prices1" =
