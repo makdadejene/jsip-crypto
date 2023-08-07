@@ -34,17 +34,6 @@ module ArimaModel = struct
     }
   ;;
 
-  (* let create_with_dataset ~dataset ?(weighted_average = 0.5) () =
-    let ar_model = AutoRegressor.create ~dataset () in
-    let mvg_model = MovingAverageModel.create ~dataset () in
-    { ar_model
-    ; weighted_average
-    ; mvg_model
-    ; full_dataset = dataset
-    ; predictions = List.to_array []
-    }
-  ;; *)
-
   let update_dateset t dataset = t, dataset
 
   let update_model_training_sets t training_set =

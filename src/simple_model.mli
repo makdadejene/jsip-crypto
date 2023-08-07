@@ -23,9 +23,6 @@ module ArimaModel : sig
     -> unit
     -> t
 
-  (* val create_with_dataset : dataset:Total_Data.t ->
-     ?weighted_average:float -> unit -> t *)
-
   val update_dateset : 'a -> 'b -> 'a * 'b
   val predict_next_price : t -> Prediction.t
   val predict_all_prices : t -> int -> unit
