@@ -16,8 +16,8 @@ let handler ~body:_ _sock req =
   let uri = Cohttp.Request.uri req in
   let request = Uri.path uri |> String.split ~on:'/' in
   match request with
-  | [ coin; start_date ; end_date ] ->
-    let response = [%string "beep boop %{coin} %{year}"] in
+  | [ coin; start_date; end_date ] ->
+    let response = [%string "beep boop %{coin} %{start_date} %{end_date}"] in
     Server.respond_string response
   | _ -> Server.respond_string ~status:`Not_found "Route not found"
 ;;

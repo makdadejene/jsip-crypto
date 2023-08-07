@@ -6,11 +6,11 @@ module ArimaModel : sig
     ; mutable weighted_average : float
     ; mutable mvg_model : Moving_average.MovingAverageModel.t
     ; mutable full_dataset : Total_Data.t
-    ; mutable predictions : Prediction.t list
+    ; mutable predictions : Prediction.t array
     }
 
   val sexp_of_t : t -> Sexplib0.Sexp.t
-  val predictions : t -> Prediction.t list
+  val predictions : t -> Prediction.t array
   val full_dataset : t -> Total_Data.t
   val mvg_model : t -> Moving_average.MovingAverageModel.t
   val weighted_average : t -> float
@@ -18,5 +18,5 @@ module ArimaModel : sig
   val create : dataset:Total_Data.t -> ?weighted_average:float -> unit -> t
   val update_dateset : 'a -> 'b -> 'a * 'b
   val predict_next_price : t -> Prediction.t
-  val graph_points : t -> (string * float) list * (string * float) list
+  val graph_points : t -> (string * float) list * (string * float) array
 end

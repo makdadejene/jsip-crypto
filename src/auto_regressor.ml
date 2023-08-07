@@ -14,7 +14,7 @@ module AutoRegressor = struct
   let update_parameters t p = t.p <- p
   let update_dateset t ~new_dataset = t.dataset <- new_dataset
 
-  let predict_next_price t  =
+  let predict_next_price t =
     let training_dataset =
       Total_Data.last_n_days_dataset (dataset t) ~num_of_days:(p t)
     in

@@ -9,7 +9,7 @@ module ArimaModel = struct
     ; mutable weighted_average : float
     ; mutable mvg_model : MovingAverageModel.t
     ; mutable full_dataset : Total_Data.t
-    ; mutable predictions : Prediction.t list
+    ; mutable predictions : Prediction.t array
     }
   [@@deriving sexp_of, fields ~getters]
 
@@ -20,11 +20,19 @@ module ArimaModel = struct
     ; weighted_average
     ; mvg_model
     ; full_dataset = dataset
-    ; predictions = []
+    ; predictions = List.to_array []
     }
   ;;
 
   let update_dateset t dataset = t, dataset
+
+  let update_predictions t prediction =
+    let new_predictions =
+      Array.append t.predictions (List.to_array [ prediction ])
+    in
+    Array.sort new_predictions ~compare:Prediction.compare;
+    t.predictions <- new_predictions
+  ;;
 
   let predict_next_price t =
     let ar_model_prediction =
@@ -33,10 +41,14 @@ module ArimaModel = struct
     let mvg_model_prediction =
       MovingAverageModel.predict_next_price (mvg_model t)
     in
-    Prediction.average_predictions
-      ~first_prediction:ar_model_prediction
-      ~second_prediction:mvg_model_prediction
-      ~prediction_coeff:(weighted_average t)
+    let prediction =
+      Prediction.average_predictions
+        ~first_prediction:ar_model_prediction
+        ~second_prediction:mvg_model_prediction
+        ~prediction_coeff:(weighted_average t)
+    in
+    update_predictions t prediction;
+    prediction
   ;;
 
   let graph_points t =
@@ -46,7 +58,7 @@ module ArimaModel = struct
         ~f:(fun (date, price) -> Date.to_string date, price)
     in
     let prediction_points =
-      List.map (predictions t) ~f:(fun prediction ->
+      Array.map (predictions t) ~f:(fun prediction ->
         ( Date.to_string (Prediction.date prediction)
         , Prediction.prediction prediction ))
     in
@@ -99,6 +111,5 @@ let%expect_test "simple_model_test" =
   print_s [%message (prediction : Prediction.t)];
   [%expect
     {| 
-    (prediction ((date ((year 2022) (month 7) (day
-   30))) (prediction 5.2000000000007276)))|}]
+   (prediction ((date ((year 2022) (month 7) (day 30))) (prediction 1)))|}]
 ;;

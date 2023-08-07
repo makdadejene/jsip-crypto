@@ -338,6 +338,9 @@ module Prediction = struct
   let prediction t = t.prediction
   let create date prediction = { date; prediction }
 
+  let compare t1 t2 = 
+    Date.compare (date t1) (date t2)
+
   let average_predictions
     ~first_prediction
     ~second_prediction
