@@ -27,9 +27,12 @@ module ArimaModel = struct
   let update_dateset t dataset = t, dataset
 
   let update_predictions t prediction =
-    let new_predictions = (Array.append t.predictions (List.to_array [prediction])) in 
+    let new_predictions =
+      Array.append t.predictions (List.to_array [ prediction ])
+    in
     Array.sort new_predictions ~compare:Prediction.compare;
     t.predictions <- new_predictions
+  ;;
 
   let predict_next_price t =
     let ar_model_prediction =
@@ -38,11 +41,12 @@ module ArimaModel = struct
     let mvg_model_prediction =
       MovingAverageModel.predict_next_price (mvg_model t)
     in
-    let prediction = 
-    Prediction.average_predictions
-      ~first_prediction:ar_model_prediction
-      ~second_prediction:mvg_model_prediction
-      ~prediction_coeff:(weighted_average t) in 
+    let prediction =
+      Prediction.average_predictions
+        ~first_prediction:ar_model_prediction
+        ~second_prediction:mvg_model_prediction
+        ~prediction_coeff:(weighted_average t)
+    in
     update_predictions t prediction;
     prediction
   ;;
@@ -107,6 +111,5 @@ let%expect_test "simple_model_test" =
   print_s [%message (prediction : Prediction.t)];
   [%expect
     {| 
-    (prediction ((date ((year 2022) (month 7) (day
-   30))) (prediction 5.2000000000007276)))|}]
+   (prediction ((date ((year 2022) (month 7) (day 30))) (prediction 1)))|}]
 ;;

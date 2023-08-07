@@ -61,7 +61,7 @@ module MovingAverageModel = struct
           result @ [ date, sum /. Int.to_float range ])
         else [])
   ;;
-
+  
   let predict_next_price t =
     let moving_averages =
       get_moving_avgs (dataset t) (moving_avereage_window t)
