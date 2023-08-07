@@ -10,7 +10,7 @@ module AutoRegressor = struct
     }
   [@@deriving sexp_of, fields ~getters]
 
-  let create ~dataset ?(p = 3) () = { p; dataset }
+  let create ~dataset ?(p = 10) () = { p; dataset }
   let update_parameters t p = t.p <- p
   let update_dateset t ~new_dataset = t.dataset <- new_dataset
 

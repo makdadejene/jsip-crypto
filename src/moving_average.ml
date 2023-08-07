@@ -14,7 +14,7 @@ module MovingAverageModel = struct
   let moving_avereage_window t = t.moving_average_window
   let dataset t = t.dataset
 
-  let create ~dataset ?(q = 3) ?(moving_average_window = 5) () =
+  let create ~dataset ?(q = 3) ?(moving_average_window = 7) () =
     { q; dataset; moving_average_window }
   ;;
 
