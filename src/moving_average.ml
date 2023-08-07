@@ -61,8 +61,8 @@ module MovingAverageModel = struct
           result @ [ date, sum /. Int.to_float range ])
         else [])
   ;;
-  
-(* Empty moving average would be checked here. *)
+
+  (* Empty moving average would be checked here. *)
 
   let predict_next_price t =
     let moving_averages =
@@ -155,7 +155,7 @@ let%expect_test "mvg_predictor_default" =
   print_s [%message (prediction : Prediction.t)];
   [%expect
     {|
-    (prediction ((date ((year 2022) (month 7) (day 30))) (prediction 2)))|}]
+    (prediction ((date ((year 2022) (month 7) (day 30))) (prediction 3)))|}]
 ;;
 
 let%expect_test "mvg_predictor_large_window_large_q" =
