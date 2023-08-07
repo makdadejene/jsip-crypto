@@ -12,6 +12,7 @@ import { localPoint } from '@visx/event';
 import { LinearGradient } from '@visx/gradient';
 import { max, extent, bisector } from '@visx/vendor/d3-array';
 import { timeFormat } from '@visx/vendor/d3-time-format';
+import Input from '@mui/joy/Input';
 
 
 import AppBar from '@mui/material/AppBar';
@@ -23,6 +24,18 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Header from "./Header";
 import Legend from "./Legend";
+
+
+// import Ethereum from "./Ethereum";
+// import XRP from ".Xrp";
+
+import {
+    BrowserRouter as Router,
+    Switch,
+    Route,
+    Redirect,
+} from "react-router-dom";
+
 
 
 type TooltipData = AppleStock;
@@ -130,10 +143,6 @@ export default withTooltip(
             <div>
                 <Header />
 
-                {/* {(tooltipData) ?
-                    <Legend data={tooltipData} />
-                    :
-                    <></>} */}
 
                 <div style={{ display: 'flex', justifyContent: 'center', width: "100%", position: "relative" }}> <div>
                     <svg width={1000} height={600} style={{
@@ -256,9 +265,19 @@ export default withTooltip(
 
                         }
                     </div>
+
+
                 </div>
 
+
+
                 </div >
+
+                {/* {tooltipData && (
+                    <Box display="flex" justifyContent="center" mt={2}>
+                        <Input type="text" placeholder="Enter text here" />
+                    </Box>
+                )} */}
 
             </div>
         );
