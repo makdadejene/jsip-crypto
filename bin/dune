@@ -1,6 +1,6 @@
 (executable
  (public_name jsipcrypto)
  (name main)
- (libraries core crypto_src core_unix.command_unix)
+ (libraries interface_lib core crypto_src core_unix.command_unix)
  (preprocess
   (pps ppx_jane)))
