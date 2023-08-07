@@ -145,6 +145,7 @@ module Prediction : sig
     -> second_prediction:t
     -> prediction_coeff:float
     -> t
+  val compare : t -> t -> int
 end
 
 module Model : sig
