@@ -13,7 +13,19 @@ module ArimaModel = struct
     }
   [@@deriving sexp_of, fields ~getters]
 
-  let create ~dataset ?(weighted_average = 0.5) () =
+  let create coin ?(weighted_average = 0.5) () =
+    let dataset = Fetch_data.get_day_data coin in
+    let ar_model = AutoRegressor.create ~dataset () in
+    let mvg_model = MovingAverageModel.create ~dataset () in
+    { ar_model
+    ; weighted_average
+    ; mvg_model
+    ; full_dataset = dataset
+    ; predictions = List.to_array []
+    }
+  ;;
+
+  let create_with_dataset ~dataset ?(weighted_average = 0.5) () =
     let ar_model = AutoRegressor.create ~dataset () in
     let mvg_model = MovingAverageModel.create ~dataset () in
     { ar_model
@@ -25,6 +37,11 @@ module ArimaModel = struct
   ;;
 
   let update_dateset t dataset = t, dataset
+
+  let update_model_training_sets t training_set =
+    MovingAverageModel.update_dateset (mvg_model t) ~new_dataset:training_set;
+    AutoRegressor.update_dateset (ar_model t) ~new_dataset:training_set
+  ;;
 
   let update_predictions t prediction =
     let new_predictions =
@@ -49,6 +66,33 @@ module ArimaModel = struct
     in
     update_predictions t prediction;
     prediction
+  ;;
+
+  let predict_all_prices t window_size =
+    let full_dataset = full_dataset t in
+    let coin = Total_Data.crypto full_dataset in
+    let predictions =
+      List.foldi
+        (Total_Data.days full_dataset)
+        ~init:(List.to_array [])
+        ~f:(fun index acc _day_data ->
+          if window_size > index + 1
+             && AutoRegressor.p (ar_model t) > index + 1
+             && MovingAverageModel.q (mvg_model t) > index + 1
+             && MovingAverageModel.moving_avereage_window (mvg_model t)
+                > index + 1
+          then (
+            let training_dataset =
+              { Total_Data.crypto = coin
+              ; days = List.take (Total_Data.days full_dataset) index
+              }
+            in
+            update_model_training_sets t training_dataset;
+            let prediction = predict_next_price t in
+            Array.append acc (List.to_array [ prediction ]))
+          else acc)
+    in
+    t.predictions <- predictions
   ;;
 
   let data_graph_points t =
@@ -77,51 +121,3 @@ module ArimaModel = struct
     dataset_points, prediction_points
   ;;
 end
-
-let%expect_test "simple_model_test" =
-  let total_data = Total_Data.create Crypto.Bitcoin in
-  let days1 =
-    List.init 9 ~f:(fun int ->
-      Day_Data.create
-        ~date:("2022-07-1" ^ Int.to_string (int + 1))
-        ~close:(Int.to_float (int + 1))
-        ())
-  in
-  let days2 =
-    List.init 10 ~f:(fun int ->
-      Day_Data.create
-        ~date:("2022-07-2" ^ Int.to_string int)
-        ~close:(Int.to_float (10 - int))
-        ())
-  in
-  Total_Data.add_days_data total_data days1;
-  Total_Data.add_days_data total_data days2;
-  let model = ArimaModel.create ~dataset:total_data () in
-  let prediction = ArimaModel.predict_next_price model in
-  let gp = Gp.create () in
-  let data_points_series =
-    Gp.Series.lines_xy
-      ~color:`Green
-      (List.map
-         (Total_Data.get_all_dates_prices total_data ())
-         ~f:(fun data_tuple ->
-           Date.time_to_unix (fst data_tuple), snd data_tuple))
-  in
-  let prediction_series =
-    Gp.Series.points_xy
-      ~color:`Magenta
-      [ (let unix_date = Date.time_to_unix (Prediction.date prediction) in
-         let price = Prediction.prediction prediction in
-         price, unix_date)
-      ]
-  in
-  Gp.plot_many
-    gp
-    ~output:(Gp.Output.create (`Png "arima_predictor_test.png"))
-    [ data_points_series; prediction_series ];
-  Gp.close gp;
-  print_s [%message (prediction : Prediction.t)];
-  [%expect
-    {| 
-   (prediction ((date ((year 2022) (month 7) (day 30))) (prediction 1)))|}]
-;;

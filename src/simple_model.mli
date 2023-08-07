@@ -15,8 +15,18 @@ module ArimaModel : sig
   val mvg_model : t -> Moving_average.MovingAverageModel.t
   val weighted_average : t -> float
   val ar_model : t -> Auto_regressor.AutoRegressor.t
-  val create : dataset:Total_Data.t -> ?weighted_average:float -> unit -> t
+  val create : Crypto.t -> ?weighted_average:float -> unit -> t
+
+  val create_with_dataset
+    :  dataset:Total_Data.t
+    -> ?weighted_average:float
+    -> unit
+    -> t
+
   val update_dateset : 'a -> 'b -> 'a * 'b
   val predict_next_price : t -> Prediction.t
-  val graph_points : t -> (string * float) list * (string * float) array
+  val predict_all_prices : t -> int -> unit
+  val data_graph_points : t -> (string * float) list
+  val predictions_graph_points : t -> (string * float) array
+  val all_graph_points : t -> (string * float) list * (string * float) array
 end

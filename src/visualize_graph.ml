@@ -36,16 +36,13 @@ let test_ar_graph () =
          ~f:(fun data_tuple ->
            Date.time_to_unix (fst data_tuple), snd data_tuple))
   in
-  (* print_s [%message (List.map (Total_Data.get_all_dates_prices
-     total_data ()) ~f:(fun data_tuple -> Date.time_to_unix (fst
-     data_tuple), snd data_tuple) : (float * float) list)]; *)
+  (* print_s [%message (List.map (Total_Data.get_all_dates_prices total_data
+     ()) ~f:(fun data_tuple -> Date.time_to_unix (fst data_tuple), snd
+     data_tuple) : (float * float) list)]; *)
   let prediction_series =
     Gp.Series.points_xy
       ~color:`Black
-      [ (let unix_date =
-           Date.time_to_unix
-             (Prediction.date prediction)
-         in
+      [ (let unix_date = Date.time_to_unix (Prediction.date prediction) in
          let price = Prediction.prediction prediction in
          unix_date, price)
       ]
@@ -110,10 +107,7 @@ let test_mvg_graph () =
   let prediction_series =
     Gp.Series.points_xy
       ~color:`Magenta
-      [ (let unix_date =
-           Date.time_to_unix
-             (Prediction.date prediction)
-         in
+      [ (let unix_date = Date.time_to_unix (Prediction.date prediction) in
          let price = Prediction.prediction prediction in
          unix_date, price)
       ]
@@ -145,7 +139,9 @@ let test_simple_graph () =
   in
   Total_Data.add_days_data total_data days1;
   Total_Data.add_days_data total_data days2;
-  let model = Simple_model.ArimaModel.create ~dataset:total_data () in
+  let model =
+    Simple_model.ArimaModel.create_with_dataset ~dataset:total_data ()
+  in
   let prediction = Simple_model.ArimaModel.predict_next_price model in
   let gp = Gp.create () in
   let data_points_series =
@@ -159,10 +155,7 @@ let test_simple_graph () =
   let prediction_series =
     Gp.Series.points_xy
       ~color:`Magenta
-      [ (let unix_date =
-           Date.time_to_unix
-             (Prediction.date prediction)
-         in
+      [ (let unix_date = Date.time_to_unix (Prediction.date prediction) in
          let price = Prediction.prediction prediction in
          unix_date, price)
       ]

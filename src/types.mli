@@ -5,7 +5,7 @@ module Crypto : sig
     | Bitcoin
     | Ethereum
     | XRP
-  [@@deriving compare, sexp_of]
+  [@@deriving compare, sexp_of, enumerate, hash]
 
   val get_data_file : t -> string
 end
@@ -145,6 +145,7 @@ module Prediction : sig
     -> second_prediction:t
     -> prediction_coeff:float
     -> t
+
   val compare : t -> t -> int
 end
 

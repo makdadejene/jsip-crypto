@@ -6,7 +6,7 @@ module Crypto = struct
       | Bitcoin
       | Ethereum
       | XRP
-    [@@deriving compare, sexp]
+    [@@deriving compare, sexp, hash, enumerate]
   end
 
   include T
@@ -337,9 +337,7 @@ module Prediction = struct
   let date t = t.date
   let prediction t = t.prediction
   let create date prediction = { date; prediction }
-
-  let compare t1 t2 = 
-    Date.compare (date t1) (date t2)
+  let compare t1 t2 = Date.compare (date t1) (date t2)
 
   let average_predictions
     ~first_prediction

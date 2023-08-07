@@ -9,8 +9,7 @@
   async
   cohttp-async
   core_unix.command_unix
-  jsonaf)
- (inline_tests
-  (deps ./data/btc_data.txt))
+  jsonaf
+  crypto_src)
  (preprocess
   (pps ppx_jane)))
