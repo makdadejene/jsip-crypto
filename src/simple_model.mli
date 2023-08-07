@@ -15,13 +15,16 @@ module ArimaModel : sig
   val mvg_model : t -> Moving_average.MovingAverageModel.t
   val weighted_average : t -> float
   val ar_model : t -> Auto_regressor.AutoRegressor.t
-  val create : Crypto.t -> ?weighted_average:float -> unit -> t
 
-  val create_with_dataset
-    :  dataset:Total_Data.t
+  val create
+    :  coin:Crypto.t
+    -> ?dataset:Total_Data.t
     -> ?weighted_average:float
     -> unit
     -> t
+
+  (* val create_with_dataset : dataset:Total_Data.t ->
+     ?weighted_average:float -> unit -> t *)
 
   val update_dateset : 'a -> 'b -> 'a * 'b
   val predict_next_price : t -> Prediction.t

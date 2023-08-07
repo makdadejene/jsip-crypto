@@ -8,7 +8,7 @@ module Gp = Gnuplot
 let init crypto_table =
   let all_coins = Crypto.all in
   List.iter all_coins ~f:(fun coin ->
-    let coin_model = Simple_model.ArimaModel.create coin () in
+    let coin_model = Simple_model.ArimaModel.create ~coin () in
     Hashtbl.set crypto_table ~key:coin ~data:coin_model)
 ;;
 
