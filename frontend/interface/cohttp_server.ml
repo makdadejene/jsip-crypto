@@ -33,7 +33,7 @@ let handler ~body:_ _sock req =
 let handle url =
   let request = url |> String.split ~on:'/' in
   match request with
-  | [ _; coin; window ] ->
+  | [ _; _; _; coin; window ] ->
     let response =
       Crypto_interface.predict_all_prices crypto_table coin window
     in
