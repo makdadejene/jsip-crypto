@@ -252,6 +252,7 @@ module Total_Data = struct
     let crypto t = t.crypto
     let days t = t.days
     let create crypto = { crypto; days = [] }
+    let is_empty t = List.is_empty (days t)
 
     let create_from_date_price crypto data_list =
       let days_list =

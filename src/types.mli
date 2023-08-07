@@ -111,6 +111,7 @@ module Total_Data : sig
   val crypto : t -> Crypto.t
   val days : t -> Day_Data.t list
   val create : Crypto.t -> t
+  val is_empty : t -> bool
   val create_from_date_price : Crypto.t -> (Date.t * float) list -> t
   val add_day_data : t -> Day_Data.t -> unit
   val add_days_data : t -> Day_Data.t list -> unit

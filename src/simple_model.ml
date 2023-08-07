@@ -13,19 +13,17 @@ module ArimaModel = struct
     }
   [@@deriving sexp_of, fields ~getters]
 
-  let create coin ?(weighted_average = 0.5) () =
-    let dataset = Fetch_data.get_day_data coin in
-    let ar_model = AutoRegressor.create ~dataset () in
-    let mvg_model = MovingAverageModel.create ~dataset () in
-    { ar_model
-    ; weighted_average
-    ; mvg_model
-    ; full_dataset = dataset
-    ; predictions = List.to_array []
-    }
-  ;;
-
-  let create_with_dataset ~dataset ?(weighted_average = 0.5) () =
+  let create
+    ~coin
+    ?(dataset = Types.Total_Data.create coin)
+    ?(weighted_average = 0.5)
+    ()
+    =
+    let dataset =
+      if Total_Data.is_empty dataset
+      then Fetch_data.get_day_data coin
+      else dataset
+    in
     let ar_model = AutoRegressor.create ~dataset () in
     let mvg_model = MovingAverageModel.create ~dataset () in
     { ar_model

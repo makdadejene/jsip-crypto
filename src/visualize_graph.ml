@@ -140,7 +140,10 @@ let test_simple_graph () =
   Total_Data.add_days_data total_data days1;
   Total_Data.add_days_data total_data days2;
   let model =
-    Simple_model.ArimaModel.create_with_dataset ~dataset:total_data ()
+    Simple_model.ArimaModel.create
+      ~coin:Crypto.Bitcoin
+      ~dataset:total_data
+      ()
   in
   let prediction = Simple_model.ArimaModel.predict_next_price model in
   let gp = Gp.create () in
