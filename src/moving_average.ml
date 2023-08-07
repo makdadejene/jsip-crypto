@@ -62,6 +62,8 @@ module MovingAverageModel = struct
         else [])
   ;;
   
+(* Empty moving average would be checked here. *)
+
   let predict_next_price t =
     let moving_averages =
       get_moving_avgs (dataset t) (moving_avereage_window t)

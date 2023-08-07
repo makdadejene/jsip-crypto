@@ -51,7 +51,19 @@ module ArimaModel = struct
     prediction
   ;;
 
-  let graph_points t =
+  let data_graph_points t =
+    List.map
+      (Total_Data.get_all_dates_prices (full_dataset t) ())
+      ~f:(fun (date, price) -> Date.to_string date, price)
+  ;;
+
+  let predictions_graph_points t =
+    Array.map (predictions t) ~f:(fun prediction ->
+      ( Date.to_string (Prediction.date prediction)
+      , Prediction.prediction prediction ))
+  ;;
+
+  let all_graph_points t =
     let dataset_points =
       List.map
         (Total_Data.get_all_dates_prices (full_dataset t) ())
