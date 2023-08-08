@@ -5,6 +5,9 @@ module Crypto : sig
     | Bitcoin
     | Ethereum
     | XRP
+    | BNB
+    | Cardano
+    | Solana
   [@@deriving compare, sexp_of, enumerate, hash]
 
   val get_data_file : t -> string

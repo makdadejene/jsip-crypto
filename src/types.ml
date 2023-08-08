@@ -6,6 +6,9 @@ module Crypto = struct
       | Bitcoin
       | Ethereum
       | XRP
+      | BNB
+      | Cardano
+      | Solana
     [@@deriving compare, sexp, hash, enumerate]
   end
 
@@ -17,6 +20,9 @@ module Crypto = struct
     | Bitcoin -> "data/btc_data.txt"
     | Ethereum -> "data/ethereum_data.txt"
     | XRP -> "data/xrp_data.txt"
+    | BNB -> "data/bnb_data.txt"
+    | Cardano -> "data/cardano_data.txt"
+    | Solana -> "data/solana_data.txt"
   ;;
 end
 
