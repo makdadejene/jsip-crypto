@@ -92,7 +92,7 @@ export default withTooltip(
                 .then((response) => {
                     response.json().then(json => setStock(json))
                 }).then((data) => {
-                    let slice = data.slice(30);
+                    // let slice = data.slice(30);
                     setInitialDatesAndPrices({ state: 'loaded', data })
                 }).catch((error) => {
                     setInitialDatesAndPrices({ state: 'error', error: error.message })
