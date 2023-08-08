@@ -74,11 +74,11 @@ module ArimaModel = struct
         (Total_Data.days full_dataset)
         ~init:(List.to_array [])
         ~f:(fun index acc _day_data ->
-          if window_size > index + 1
-             && AutoRegressor.p (ar_model t) > index + 1
-             && MovingAverageModel.q (mvg_model t) > index + 1
+          if window_size <= index + 1
+             && AutoRegressor.p (ar_model t) <= index + 1
+             && MovingAverageModel.q (mvg_model t) <= index + 1
              && MovingAverageModel.moving_avereage_window (mvg_model t)
-                > index + 1
+                <= index + 1
           then (
             let training_dataset =
               { Total_Data.crypto = coin
