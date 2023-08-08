@@ -30,9 +30,9 @@
   },
   "options": {
     "allowedHosts": [
-      "ec2-44-196-240-247.compute-1.amazonaws.com/"
+      "ec2-44-196-240-247.compute-1.amazonaws.com:8181"
     ],
-    "proxy": "https://localhost:8080/"
+    "proxy": "http://localhost:8080"
   },
   "scripts": {
     "start": "PORT=8181 react-scripts start",
