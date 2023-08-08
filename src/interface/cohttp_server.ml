@@ -1,6 +1,6 @@
 open! Core
 open! Jsonaf_kernel
-open Async_kernel
+open! Async_kernel
 open! Crypto_src.Types
 module Server = Cohttp_async.Server
 
@@ -30,8 +30,11 @@ let handler ~body:_ _sock req =
   | _ -> Server.respond_string ~status:`Not_found "Route not found"
 ;;
 
-let handler_test url =
+let handle url =
+  let crypto_table = Hashtbl.create (module Crypto) in
+  Crypto_interface.init crypto_table;
   let request = url |> String.split ~on:'/' in
+  print_s [%message (request : string list)];
   match request with
   | [ _; _; _; coin; window ] ->
     let response =
@@ -54,10 +57,14 @@ let handler_test url =
   | _ -> "Server.respond_string ~status:`Not_found"
 ;;
 
-(* let%expect_test "check_response" = let url_response = handle
-   "http://ec2-44-196-240-247.compute-1.amazonaws.com:8181/bitcoin/30" in
-   print_s [%message (url_response : string)]; [%expect {|(url_response((1,
-   2,3|}] ;; *)
+let%expect_test "check_response" =
+  let url_response =
+    handle
+      "http://ec2-44-196-240-247.compute-1.amazonaws.com:8181/bitcoin/30"
+  in
+  print_s [%message (url_response : string)];
+  [%expect {|(url_response((1,2,3|}]
+;;
 
 let start_server port () =
   Stdlib.Printf.eprintf "Listening for HTTP on\n   port %d\n" port;
@@ -72,18 +79,4 @@ let start_server port () =
   in
   Crypto_interface.init crypto_table;
   Deferred.never ()
-;;
-
-let () =
-  let module Command = Async_command in
-  Command.async_spec
-    ~summary:"Start a hello world Async server"
-    Command.Spec.(
-      empty
-      +> flag
-           "-p"
-           (optional_with_default 8080 int)
-           ~doc:"int Source port to listen on")
-    start_server
-  |> Command_unix.run
 ;;

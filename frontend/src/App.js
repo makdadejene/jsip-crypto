@@ -55,6 +55,7 @@ const tooltipStyles = {
 // util
 const formatDate = timeFormat("%b %d, '%y");
 
+
 // accessors
 const getDate = (d: AppleStock) => new Date(d.date);
 const getStockValue = (d: AppleStock) => d.close;

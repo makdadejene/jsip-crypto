@@ -13,10 +13,11 @@ module Crypto = struct
   include Comparable.Make (T)
 
   let get_data_file t =
+    let () = print_s [%message (Sys_unix.ls_dir "../data/" : string list)] in
     match t with
-    | Bitcoin -> "data/btc_data.txt"
-    | Ethereum -> "data/ethereum_data.txt"
-    | XRP -> "data/xrp_data.txt"
+    | Bitcoin -> "../data/btc_data.txt"
+    | Ethereum -> "../data/ethereum_data.txt"
+    | XRP -> "../data/xrp_data.txt"
   ;;
 end
 

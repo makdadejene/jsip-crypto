@@ -11,5 +11,8 @@
   core_unix.command_unix
   jsonaf
   crypto_src)
+ (inline_tests
+  (deps
+   (glob_files ../data/*.txt)))
  (preprocess
   (pps ppx_jane)))
