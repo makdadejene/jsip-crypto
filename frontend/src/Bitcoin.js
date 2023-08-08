@@ -15,6 +15,7 @@ import { timeFormat } from '@visx/vendor/d3-time-format';
 import Input from '@mui/joy/Input';
 import { Link } from "react-router-dom";
 
+
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -24,6 +25,12 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Header from "./Header";
 import Legend from "./Legend";
+
+
+// import Ethereum from "./Ethereum";
+// import XRP from ".Xrp";
+
+
 
 
 type TooltipData = AppleStock;
@@ -42,6 +49,7 @@ const tooltipStyles = {
 
 // util
 const formatDate = timeFormat("%b %d, '%y");
+
 
 // accessors
 const getDate = (d: AppleStock) => new Date(d.date);
