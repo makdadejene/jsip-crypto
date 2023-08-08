@@ -13,7 +13,7 @@ import { LinearGradient } from '@visx/gradient';
 import { max, extent, bisector } from '@visx/vendor/d3-array';
 import { timeFormat } from '@visx/vendor/d3-time-format';
 import Input from '@mui/joy/Input';
-
+import { Link } from "react-router-dom";
 
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';

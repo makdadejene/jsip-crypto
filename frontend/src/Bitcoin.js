@@ -25,17 +25,24 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Header from "./Header";
 import Legend from "./Legend";
+import { getConfig } from '@testing-library/react';
 
 
 // import Ethereum from "./Ethereum";
 // import XRP from ".Xrp";
 
+// let getCoin = {
+//     date : 
+//     prices :
+// }
 
 
+type data = {
+    date: string;
+    price: number;
+}
 
-type TooltipData = AppleStock;
-
-const stock = appleStock.slice(800);
+// const stock = appleStock.slice(800);
 export const background = '#3b6978';
 export const background2 = '#204051';
 export const accentColor = '#edffea';
@@ -52,8 +59,8 @@ const formatDate = timeFormat("%b %d, '%y");
 
 
 // accessors
-const getDate = (d: AppleStock) => new Date(d.date);
-const getStockValue = (d: AppleStock) => d.close;
+const getDate = (d: data) => new Date(d.date);
+const getStockValue = (d: data) => d.price;
 const bisectDate = bisector((d) => new Date(d.date)).left;
 
 export type AreaProps = {
@@ -78,6 +85,20 @@ export default withTooltip(
         const innerHeight = 600;
 
         const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+        const [initialDatesAndPrices, setInitialDatesAndPrices] = useState({ state: 'loading' });
+        const [stock, setStock] = useState([]);
+        useEffect(() => {
+            fetch("http://ec2-44-196-240-247.compute-1.amazonaws.com:8181/api/bitcoin/30")
+                .then((response) => {
+                    response.json().then(json => setStock(json))
+                }).then((data) => {
+                    let slice = data.slice(30);
+                    setInitialDatesAndPrices({ state: 'loaded', data })
+                }).catch((error) => {
+                    setInitialDatesAndPrices({ state: 'error', error: error.message })
+                });
+            return () => { };
+        }, [])
         const dateScale = useMemo(
             () =>
                 scaleTime({
@@ -138,6 +159,8 @@ export default withTooltip(
         return (
             <div>
                 <Header />
+
+                <pre> {JSON.stringify(initialDatesAndPrices)}</pre>
 
 
                 <div style={{ display: 'flex', justifyContent: 'center', width: "100%", position: "relative" }}> <div>
