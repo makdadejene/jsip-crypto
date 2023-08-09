@@ -10,7 +10,7 @@ val init : (Crypto.t, ArimaModel.t) Base.Hashtbl.t -> unit
 val get_coin_data
   :  (Crypto.t, ArimaModel.t) Base.Hashtbl.t
   -> string
-  -> (string * float) list
+  -> (string * float) array
 
 val predict_all_prices
   :  (Crypto.t, ArimaModel.t) Base.Hashtbl.t
