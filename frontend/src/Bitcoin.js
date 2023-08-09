@@ -105,7 +105,10 @@ const Bitcoin = withTooltip(
         useEffect(() => {
             fetch("http://ec2-44-196-240-247.compute-1.amazonaws.com:8181/api/bitcoin/30")
                 .then((response) => {
-                    response.json().then(json => setStock(json))
+                    response.json().then((json: array) =>
+                        /* CR-someday hlian: You can always slice here if you want */
+                        setStock(json)
+                    )
                 }).then((data) => {
                     setInitialDatesAndPrices({ state: 'loaded', data })
                 }).catch((error) => {
@@ -114,12 +117,13 @@ const Bitcoin = withTooltip(
             return () => { };
         }, [])
         const dateScale = useMemo(
-            () =>
-                scaleTime({
+            () => {
+                return scaleTime({
                     range: [margin.left, innerWidth + margin.left],
                     domain: extent(stock, getDate),
-                }),
-            [innerWidth, margin.left],
+                });
+            },
+            [innerWidth, margin.left, stock],
         );
 
 
@@ -130,25 +134,27 @@ const Bitcoin = withTooltip(
                     domain: [0, (max(stock, getStockValue) || 0) + innerHeight / 3],
                     nice: true,
                 }),
-            [margin.top, innerHeight],
+            [margin.top, innerHeight, stock],
         );
 
         const handleTooltip = useCallback(
             (event: React.TouchEvent<SVGRectElement> | React.MouseEvent<SVGRectElement>) => {
                 const { x } = localPoint(event) || { x: 0 };
                 const x0 = dateScale.invert(x);
-                const index = bisectDate(stock, x0, 1);
-                const d0 = stock[index - 1];
-                const d1 = stock[index];
-                let d = d0;
-                if (d1 && getDate(d1)) {
-                    d = x0.valueOf() - getDate(d0).valueOf() > getDate(d1).valueOf() - x0.valueOf() ? d1 : d0;
+                if (!isNaN(x0)) {
+                    const index = bisectDate(stock, x0, 1);
+                    const d0 = stock[index - 1];
+                    const d1 = stock[index];
+                    let d = d0;
+                    if (d1 && getDate(d1)) {
+                        d = x0.valueOf() - getDate(d0).valueOf() > getDate(d1).valueOf() - x0.valueOf() ? d1 : d0;
+                    }
+                    showTooltip({
+                        tooltipData: d,
+                        tooltipLeft: x,
+                        tooltipTop: stockValueScale(getStockValue(d)),
+                    });
                 }
-                showTooltip({
-                    tooltipData: d,
-                    tooltipLeft: x,
-                    tooltipTop: stockValueScale(getStockValue(d)),
-                });
             },
             [showTooltip, stockValueScale, dateScale],
         );
@@ -156,7 +162,6 @@ const Bitcoin = withTooltip(
 
         useEffect(() => {
             const handleMouseMove = (event) => {
-                console.log({ x: event.clientX, y: event.clientY });
                 setMousePosition({ x: event.clientX, y: event.clientY });
             };
 
@@ -171,7 +176,10 @@ const Bitcoin = withTooltip(
         }, []);
 
         return (
-            <div>
+            <div style={{
+                background: 'linear-gradient(to bottom, white, gray)',
+                height: '100vh',
+            }}>
                 <Header />
 
                 <pre> {JSON.stringify(initialDatesAndPrices)}</pre>
@@ -213,7 +221,7 @@ const Bitcoin = withTooltip(
                         />
                         <AreaClosed
                             data={stock}
-                            x={(d) => 10}
+                            x={(d) => dateScale(getDate(d)) ?? 0}
                             y={(d) => stockValueScale(getStockValue(d)) ?? 0}
                             yScale={stockValueScale}
                             strokeWidth={1}
