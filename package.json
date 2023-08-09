@@ -1,9 +1,0 @@
-{
-  "dependencies": {
-    "@mui/icons-material": "^5.14.3",
-    "@mui/joy": "^5.0.0-beta.0",
-    "@mui/material": "^5.14.3",
-    "package.json": "^2.0.1",
-    "react-router-dom": "^6.14.2"
-  }
-}
