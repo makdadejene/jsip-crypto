@@ -4,7 +4,7 @@ open! Crypto_src.Types.Crypto
 open! Interface_lib
 module Gp = Gnuplot
 
-let () = Command_unix.run Visualize_graph.command
+(* let () = Command_unix.run Visualize_graph.command *)
 
 (* let test_table = Hashtbl.create (module Types.Crypto);;
 
