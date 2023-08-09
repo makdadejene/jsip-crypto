@@ -94,10 +94,11 @@ module ArimaModel = struct
   ;;
 
   let data_graph_points t =
-    List.map
-      (Total_Data.get_all_dates_prices (full_dataset t) ())
-      ~f:(fun (date, price) ->
-        Date.to_string date, Float.round_decimal price ~decimal_digits:4)
+    List.to_array
+      (List.map
+         (Total_Data.get_all_dates_prices (full_dataset t) ())
+         ~f:(fun (date, price) ->
+           Date.to_string date, Float.round_decimal price ~decimal_digits:4))
   ;;
 
   let predictions_graph_points t =
