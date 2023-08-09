@@ -13,7 +13,7 @@ import { LinearGradient } from '@visx/gradient';
 import { max, extent, bisector } from '@visx/vendor/d3-array';
 import { timeFormat } from '@visx/vendor/d3-time-format';
 import Input from '@mui/joy/Input';
-import { Link } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 
 
 import AppBar from '@mui/material/AppBar';
@@ -59,9 +59,19 @@ const formatDate = timeFormat("%b %d, '%y");
 
 
 // accessors
-const getDate = (d: data) => new Date(d.date);
-const getStockValue = (d: data) => d.price;
-const bisectDate = bisector((d) => new Date(d.date)).left;
+const parseDate = (input: string) => {
+    const date = new Date(input);
+    if (date instanceof Date && !isNaN(date)) return date;
+    else throw new Error(`invalid date ${input}`);
+}
+const getDate = (d: data) => {
+    return parseDate(d.date)
+}
+const getStockValue = (d: data) => {
+    if (d === undefined) debugger;
+    return d.price;
+}
+const bisectDate = bisector((d) => parseDate(d.date)).left;
 
 export type AreaProps = {
     width: number;
@@ -69,7 +79,12 @@ export type AreaProps = {
     margin?: { top: number; right: number; bottom: number; left: number };
 };
 
-export default withTooltip(
+export async function loader({ params }) {
+    console.log(params);
+    return params.window;
+}
+
+const Bitcoin = withTooltip(
     ({
         width,
         height,
@@ -92,7 +107,6 @@ export default withTooltip(
                 .then((response) => {
                     response.json().then(json => setStock(json))
                 }).then((data) => {
-                    // let slice = data.slice(30);
                     setInitialDatesAndPrices({ state: 'loaded', data })
                 }).catch((error) => {
                     setInitialDatesAndPrices({ state: 'error', error: error.message })
@@ -199,7 +213,7 @@ export default withTooltip(
                         />
                         <AreaClosed
                             data={stock}
-                            x={(d) => dateScale(getDate(d)) ?? 0}
+                            x={(d) => 10}
                             y={(d) => stockValueScale(getStockValue(d)) ?? 0}
                             yScale={stockValueScale}
                             strokeWidth={1}
@@ -303,3 +317,8 @@ export default withTooltip(
     },
 );
 
+export const bitcoinLoader = async ({ params }) => {
+    return { bitcoinWindow: params.window }
+}
+
+export default Bitcoin;
