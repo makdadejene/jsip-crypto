@@ -36,6 +36,10 @@ import { getConfig } from '@testing-library/react';
 //     prices :
 // }
 
+type total_data = {
+    real: data;
+    pred: data;
+}
 
 type data = {
     date: string;
@@ -64,14 +68,39 @@ const parseDate = (input: string) => {
     if (date instanceof Date && !isNaN(date)) return date;
     else throw new Error(`invalid date ${input}`);
 }
-const getDate = (d: data) => {
+
+const getRealDate = (d: total_data.real) => {
     return parseDate(d.date)
 }
-const getStockValue = (d: data) => {
+const getRealPrice = (d: total_data.real) => {
     if (d === undefined) debugger;
     return d.price;
 }
-const bisectDate = bisector((d) => parseDate(d.date)).left;
+const getPredDate = (d: total_data.pred) => {
+    return parseDate(d.date)
+}
+const getPredPrice = (d: total_data.pred) => {
+    if (d === undefined) debugger;
+    return d.price;
+}
+
+// const getDate = (d: data) => {
+//     return parseDate(d.date)
+// }
+// const getStockValue = (d: data) => {
+//     if (d === undefined) debugger;
+//     return d.price;
+// }
+// const getRealData = (d: total_data) => {
+//     return d.real;
+// }
+// const getPredData = (d: total_data) => {
+//     return d.pred;
+// }
+
+
+const bisectRealDate = bisector((d) => getRealDate(d.date)).left;
+const bisectPredDate = bisector((d) => getPredDate(d.date)).left;
 
 export type AreaProps = {
     width: number;
@@ -84,7 +113,7 @@ export async function loader({ params }) {
     return params.window;
 }
 
-const Xrp = withTooltip(
+const Bitcoin = withTooltip(
     ({
         width,
         height,
@@ -103,7 +132,7 @@ const Xrp = withTooltip(
         const [initialDatesAndPrices, setInitialDatesAndPrices] = useState({ state: 'loading' });
         const [stock, setStock] = useState([]);
         useEffect(() => {
-            fetch("http://ec2-44-196-240-247.compute-1.amazonaws.com:8181/api/xrp/30")
+            fetch("http://ec2-44-196-240-247.compute-1.amazonaws.com:8181/api/bitcoin/30")
                 .then((response) => {
                     response.json().then((json: array) =>
                         /* CR-someday hlian: You can always slice here if you want */
@@ -116,48 +145,92 @@ const Xrp = withTooltip(
                 });
             return () => { };
         }, [])
-        const dateScale = useMemo(
+
+        const dateRealScale = useMemo(
             () => {
                 return scaleTime({
                     range: [margin.left, innerWidth + margin.left],
-                    domain: extent(stock, getDate),
+                    domain: extent(stock, getRealDate),
+                });
+            },
+            [innerWidth, margin.left, stock],
+        );
+
+        const datePredScale = useMemo(
+            () => {
+                return scaleTime({
+                    range: [margin.left, innerWidth + margin.left],
+                    domain: extent(stock, getPredDate),
                 });
             },
             [innerWidth, margin.left, stock],
         );
 
 
-        const stockValueScale = useMemo(
+        const stockRealValueScale = useMemo(
             () =>
                 scaleLinear({
                     range: [innerHeight + margin.top, margin.top],
-                    domain: [0, 1],
+                    domain: [0, (max(stock, getRealPrice) || 0) + innerHeight / 3],
                     nice: true,
                 }),
             [margin.top, innerHeight, stock],
         );
 
-        const handleTooltip = useCallback(
+        const stockPredValueScale = useMemo(
+            () =>
+                scaleLinear({
+                    range: [innerHeight + margin.top, margin.top],
+                    domain: [0, (max(stock, getPredPrice) || 0) + innerHeight / 3],
+                    nice: true,
+                }),
+            [margin.top, innerHeight, stock],
+        );
+
+        const handleRealTooltip = useCallback(
             (event: React.TouchEvent<SVGRectElement> | React.MouseEvent<SVGRectElement>) => {
                 const { x } = localPoint(event) || { x: 0 };
-                const x0 = dateScale.invert(x);
+                const x0 = dateRealScale.invert(x);
                 if (!isNaN(x0)) {
-                    const index = bisectDate(stock, x0, 1);
+                    const index = bisectRealDate(stock, x0, 1);
                     const d0 = stock[index - 1];
                     const d1 = stock[index];
                     let d = d0;
-                    if (d1 && getDate(d1)) {
-                        d = x0.valueOf() - getDate(d0).valueOf() > getDate(d1).valueOf() - x0.valueOf() ? d1 : d0;
+                    if (d1 && getRealDate(d1)) {
+                        d = x0.valueOf() - getRealDate(d0).valueOf() > getRealDate(d1).valueOf() - x0.valueOf() ? d1 : d0;
                     }
                     showTooltip({
                         tooltipData: d,
                         tooltipLeft: x,
-                        tooltipTop: stockValueScale(getStockValue(d)),
+                        tooltipTop: stockRealValueScale(getRealPrice(d)),
                     });
                 }
             },
-            [showTooltip, stockValueScale, dateScale],
+            [showTooltip, stockRealValueScale, dateRealScale],
         );
+
+        const handlePredTooltip = useCallback(
+            (event: React.TouchEvent<SVGRectElement> | React.MouseEvent<SVGRectElement>) => {
+                const { x } = localPoint(event) || { x: 0 };
+                const x0 = datePredScale.invert(x);
+                if (!isNaN(x0)) {
+                    const index = bisectPredDate(stock, x0, 1);
+                    const d0 = stock[index - 1];
+                    const d1 = stock[index];
+                    let d = d0;
+                    if (d1 && getPredDate(d1)) {
+                        d = x0.valueOf() - getPredDate(d0).valueOf() > getPredDate(d1).valueOf() - x0.valueOf() ? d1 : d0;
+                    }
+                    showTooltip({
+                        tooltipData: d,
+                        tooltipLeft: x,
+                        tooltipTop: stockPredValueScale(getPredPrice(d)),
+                    });
+                }
+            },
+            [showTooltip, stockPredValueScale, datePredScale],
+        );
+
 
 
         useEffect(() => {
@@ -202,7 +275,7 @@ const Xrp = withTooltip(
                         <LinearGradient id="area-gradient" from={accentColor} to={accentColor} toOpacity={0.1} />
                         <GridRows
                             left={margin.left}
-                            scale={stockValueScale}
+                            scale={stockRealValueScale}
                             width={innerWidth}
                             strokeDasharray="1,3"
                             stroke={accentColor}
@@ -211,7 +284,7 @@ const Xrp = withTooltip(
                         />
                         <GridColumns
                             top={margin.top}
-                            scale={dateScale}
+                            scale={dateRealScale}
                             height={innerHeight}
                             strokeDasharray="1,3"
                             stroke={accentColor}
@@ -220,9 +293,19 @@ const Xrp = withTooltip(
                         />
                         <AreaClosed
                             data={stock}
-                            x={(d) => dateScale(getDate(d)) ?? 0}
-                            y={(d) => stockValueScale(getStockValue(d)) ?? 0}
-                            yScale={stockValueScale}
+                            x={(d) => dateRealScale(getRealDate(d)) ?? 0}
+                            y={(d) => stockRealValueScale(getRealPrice(d)) ?? 0}
+                            yScale={stockRealValueScale}
+                            strokeWidth={1}
+                            stroke="url(#area-gradient)"
+                            fill="url(#area-gradient)"
+                            curve={curveMonotoneX}
+                        />
+                        <AreaClosed
+                            data={stock}
+                            x={(d) => datePredScale(getPredDate(d)) ?? 0}
+                            y={(d) => stockPredValueScale(getPredPrice(d)) ?? 0}
+                            yScale={stockPredValueScale}
                             strokeWidth={1}
                             stroke="url(#area-gradient)"
                             fill="url(#area-gradient)"
@@ -285,7 +368,16 @@ const Xrp = withTooltip(
                                         left={mousePosition.x}
                                         style={tooltipStyles}
                                     >
-                                        {`$${getStockValue(tooltipData)}`}
+                                        {`$${getRealPrice(tooltipData)}`}
+                                    </TooltipWithBounds>
+
+                                    <TooltipWithBounds
+                                        key={Math.random()}
+                                        top={tooltipTop - 12}
+                                        left={mousePosition.x}
+                                        style={tooltipStyles}
+                                    >
+                                        {`$${getPredPrice(tooltipData)}`}
                                     </TooltipWithBounds>
                                     <Tooltip
                                         top={innerHeight + margin.top - 14}
@@ -297,7 +389,7 @@ const Xrp = withTooltip(
                                             transform: 'translateX(-50%)',
                                         }}
                                     >
-                                        {formatDate(getDate(tooltipData))}
+                                        {formatDate(getRealDate(tooltipData))}
                                     </Tooltip>
                                 </div>
                             )
@@ -324,8 +416,8 @@ const Xrp = withTooltip(
     },
 );
 
-export const xrpLoader = async ({ params }) => {
-    return { xrpWindow: params.window }
+export const bitcoinLoader = async ({ params }) => {
+    return { bitcoinWindow: params.window }
 }
 
-export default Xrp;
+export default Bitcoin;

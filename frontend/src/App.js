@@ -2,6 +2,7 @@ import Bitcoin, { bitcoinLoader } from "./Bitcoin";
 import Ethereum, { ethereumLoader } from "./Ethereum";
 import Xrp, { xrpLoader } from "./Xrp";
 import Header from "./Header";
+import Home from "./Home";
 import NoPage from "./NoPage";
 
 import ReactDOM from 'react-dom';
@@ -12,7 +13,9 @@ import { BrowserRouter, Routes, Route, createBrowserRouter, createRoutesFromElem
 
 const Root = () => {
     return (
-        <Outlet />
+        <div>
+            <Outlet />
+        </div>
     )
 }
 

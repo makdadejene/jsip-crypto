@@ -182,8 +182,6 @@ const Ethereum = withTooltip(
             }}>
                 <Header />
 
-                <pre> {JSON.stringify(initialDatesAndPrices)}</pre>
-
 
                 <div style={{ display: 'flex', justifyContent: 'center', width: "100%", position: "relative" }}> <div>
                     <svg width={1000} height={600} style={{
