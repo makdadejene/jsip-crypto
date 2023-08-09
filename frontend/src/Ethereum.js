@@ -13,7 +13,8 @@ import { LinearGradient } from '@visx/gradient';
 import { max, extent, bisector } from '@visx/vendor/d3-array';
 import { timeFormat } from '@visx/vendor/d3-time-format';
 import Input from '@mui/joy/Input';
-import { Link } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
+
 
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -24,11 +25,24 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Header from "./Header";
 import Legend from "./Legend";
+import { getConfig } from '@testing-library/react';
 
 
-type TooltipData = AppleStock;
+// import Ethereum from "./Ethereum";
+// import XRP from ".Xrp";
 
-const stock = appleStock.slice(800);
+// let getCoin = {
+//     date : 
+//     prices :
+// }
+
+
+type data = {
+    date: string;
+    price: number;
+}
+
+// const stock = appleStock.slice(800);
 export const background = '#3b6978';
 export const background2 = '#204051';
 export const accentColor = '#edffea';
@@ -43,10 +57,21 @@ const tooltipStyles = {
 // util
 const formatDate = timeFormat("%b %d, '%y");
 
+
 // accessors
-const getDate = (d: AppleStock) => new Date(d.date);
-const getStockValue = (d: AppleStock) => d.close;
-const bisectDate = bisector((d) => new Date(d.date)).left;
+const parseDate = (input: string) => {
+    const date = new Date(input);
+    if (date instanceof Date && !isNaN(date)) return date;
+    else throw new Error(`invalid date ${input}`);
+}
+const getDate = (d: data) => {
+    return parseDate(d.date)
+}
+const getStockValue = (d: data) => {
+    if (d === undefined) debugger;
+    return d.price;
+}
+const bisectDate = bisector((d) => parseDate(d.date)).left;
 
 export type AreaProps = {
     width: number;
@@ -54,7 +79,12 @@ export type AreaProps = {
     margin?: { top: number; right: number; bottom: number; left: number };
 };
 
-export default withTooltip(
+export async function loader({ params }) {
+    console.log(params);
+    return params.window;
+}
+
+const Ethereum = withTooltip(
     ({
         width,
         height,
@@ -70,13 +100,30 @@ export default withTooltip(
         const innerHeight = 600;
 
         const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+        const [initialDatesAndPrices, setInitialDatesAndPrices] = useState({ state: 'loading' });
+        const [stock, setStock] = useState([]);
+        useEffect(() => {
+            fetch("http://ec2-44-196-240-247.compute-1.amazonaws.com:8181/api/ethereum/30")
+                .then((response) => {
+                    response.json().then((json: array) =>
+                        /* CR-someday hlian: You can always slice here if you want */
+                        setStock(json)
+                    )
+                }).then((data) => {
+                    setInitialDatesAndPrices({ state: 'loaded', data })
+                }).catch((error) => {
+                    setInitialDatesAndPrices({ state: 'error', error: error.message })
+                });
+            return () => { };
+        }, [])
         const dateScale = useMemo(
-            () =>
-                scaleTime({
+            () => {
+                return scaleTime({
                     range: [margin.left, innerWidth + margin.left],
                     domain: extent(stock, getDate),
-                }),
-            [innerWidth, margin.left],
+                });
+            },
+            [innerWidth, margin.left, stock],
         );
 
 
@@ -87,25 +134,27 @@ export default withTooltip(
                     domain: [0, (max(stock, getStockValue) || 0) + innerHeight / 3],
                     nice: true,
                 }),
-            [margin.top, innerHeight],
+            [margin.top, innerHeight, stock],
         );
 
         const handleTooltip = useCallback(
             (event: React.TouchEvent<SVGRectElement> | React.MouseEvent<SVGRectElement>) => {
                 const { x } = localPoint(event) || { x: 0 };
                 const x0 = dateScale.invert(x);
-                const index = bisectDate(stock, x0, 1);
-                const d0 = stock[index - 1];
-                const d1 = stock[index];
-                let d = d0;
-                if (d1 && getDate(d1)) {
-                    d = x0.valueOf() - getDate(d0).valueOf() > getDate(d1).valueOf() - x0.valueOf() ? d1 : d0;
+                if (!isNaN(x0)) {
+                    const index = bisectDate(stock, x0, 1);
+                    const d0 = stock[index - 1];
+                    const d1 = stock[index];
+                    let d = d0;
+                    if (d1 && getDate(d1)) {
+                        d = x0.valueOf() - getDate(d0).valueOf() > getDate(d1).valueOf() - x0.valueOf() ? d1 : d0;
+                    }
+                    showTooltip({
+                        tooltipData: d,
+                        tooltipLeft: x,
+                        tooltipTop: stockValueScale(getStockValue(d)),
+                    });
                 }
-                showTooltip({
-                    tooltipData: d,
-                    tooltipLeft: x,
-                    tooltipTop: stockValueScale(getStockValue(d)),
-                });
             },
             [showTooltip, stockValueScale, dateScale],
         );
@@ -113,7 +162,6 @@ export default withTooltip(
 
         useEffect(() => {
             const handleMouseMove = (event) => {
-                console.log({ x: event.clientX, y: event.clientY });
                 setMousePosition({ x: event.clientX, y: event.clientY });
             };
 
@@ -128,8 +176,13 @@ export default withTooltip(
         }, []);
 
         return (
-            <div>
+            <div style={{
+                background: 'linear-gradient(to bottom, white, gray)',
+                height: '100vh',
+            }}>
                 <Header />
+
+                <pre> {JSON.stringify(initialDatesAndPrices)}</pre>
 
 
                 <div style={{ display: 'flex', justifyContent: 'center', width: "100%", position: "relative" }}> <div>
@@ -272,3 +325,8 @@ export default withTooltip(
     },
 );
 
+export const ethereumLoader = async ({ params }) => {
+    return { ethereumWindow: params.window }
+}
+
+export default Ethereum;
