@@ -37,6 +37,11 @@ import { getConfig } from '@testing-library/react';
 // }
 
 
+type total_data = {
+    real : data;
+    pred : data;
+}
+
 type data = {
     date: string;
     price: number;
@@ -61,17 +66,44 @@ const formatDate = timeFormat("%b %d, '%y");
 
 
 // accessors
-const parseDate = (input: string) => {
-    const date = new Date(input);
-    if (date instanceof Date && !isNaN(date)) return date;
-    else throw new Error(`invalid date ${input}`);
-}
+// const parseDate = (input: string) => {
+//     const date = new Date(input);
+//     if (date instanceof Date && !isNaN(date)) return date;
+//     else throw new Error(`invalid date ${input}`);
+// }
+
+// const getRealDate = (d: total_data.real) => {
+//     return parseDate(d.date)
+// }
+
+// const getRealPrice = (d: total_data.real) => {
+//     if (d === undefined) debugger;
+//     return d.price;
+// }
+
+// const getPredDate = (d: total_data.pred) => {
+//     return parseDate(d.date)
+// }
+
+// const getPredPrice = (d: total_data.pred) => {
+//     if (d === undefined) debugger;
+//     return d.price;
+// }
+
 const getDate = (d: data) => {
     return parseDate(d.date)
 }
 const getStockValue = (d: data) => {
     if (d === undefined) debugger;
     return d.price;
+}
+
+const getRealData = (d: total_data) => {
+    return d.real;
+}
+
+const getPredData = (d: total_data) => {
+    return d.pred;
 }
 const bisectDate = bisector((d) => parseDate(d.date)).left;
 

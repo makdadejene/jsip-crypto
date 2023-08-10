@@ -18,6 +18,9 @@ let get_coin_data crypto_table coin =
     | "bitcoin" -> Crypto.Bitcoin
     | "ethereum" -> Crypto.Ethereum
     | "xrp" -> Crypto.XRP
+    | "bnb" -> Crypto.BNB
+    | "cardano" -> Crypto.Cardano
+    | "solana" -> Crypto.Solana
     | _ -> failwith "That is not a valid coin"
   in
   let model = Hashtbl.find_exn crypto_table coin in
