@@ -66,11 +66,11 @@ const formatDate = timeFormat("%b %d, '%y");
 
 
 // accessors
-// const parseDate = (input: string) => {
-//     const date = new Date(input);
-//     if (date instanceof Date && !isNaN(date)) return date;
-//     else throw new Error(`invalid date ${input}`);
-// }
+const parseDate = (input: string) => {
+    const date = new Date(input);
+    if (date instanceof Date && !isNaN(date)) return date;
+    else throw new Error(`invalid date ${input}`);
+}
 
 // const getRealDate = (d: total_data.real) => {
 //     return parseDate(d.date)
