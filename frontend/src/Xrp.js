@@ -28,14 +28,10 @@ import Legend from "./Legend";
 import { getConfig } from '@testing-library/react';
 
 
-// import Ethereum from "./Ethereum";
-// import XRP from ".Xrp";
-
-// let getCoin = {
-//     date : 
-//     prices :
-// }
-
+type total_data = {
+    real: data;
+    pred: data;
+}
 
 type data = {
     date: string;
@@ -43,16 +39,25 @@ type data = {
 }
 
 // const stock = appleStock.slice(800);
-export const background = '#3b6978';
+export const background = '#212529';
 export const background2 = '#204051';
-export const accentColor = '#edffea';
-export const accentColorDark = '#75daad';
+// export const accentColor = '#edede9';
+// export const accentColorDark = '#6c757d';
+export const accentColor = '#edede9';
+export const accentColorDark = '#6c757d';
 const tooltipStyles = {
     ...defaultStyles,
     background,
     border: '1px solid white',
     color: 'white',
 };
+
+const predtooltipStyles = {
+    ...defaultStyles,
+    background,
+    border: '1px solid red',
+    color: 'red',
+}
 
 // util
 const formatDate = timeFormat("%b %d, '%y");
@@ -64,12 +69,39 @@ const parseDate = (input: string) => {
     if (date instanceof Date && !isNaN(date)) return date;
     else throw new Error(`invalid date ${input}`);
 }
+
+// const getRealDate = (d: total_data.real) => {
+//     return parseDate(d.date)
+// }
+
+// const getRealPrice = (d: total_data.real) => {
+//     if (d === undefined) debugger;
+//     return d.price;
+// }
+
+// const getPredDate = (d: total_data.pred) => {
+//     return parseDate(d.date)
+// }
+
+// const getPredPrice = (d: total_data.pred) => {
+//     if (d === undefined) debugger;
+//     return d.price;
+// }
+
 const getDate = (d: data) => {
     return parseDate(d.date)
 }
 const getStockValue = (d: data) => {
     if (d === undefined) debugger;
     return d.price;
+}
+
+const getRealData = (d: total_data) => {
+    return d.real;
+}
+
+const getPredData = (d: total_data) => {
+    return d.pred;
 }
 const bisectDate = bisector((d) => parseDate(d.date)).left;
 
@@ -88,7 +120,7 @@ const Xrp = withTooltip(
     ({
         width,
         height,
-        margin = { top: 0, right: 1, bottom: 0, left: 1 },
+        margin = { top: 0, right: 0, bottom: 0, left: 0 },
         showTooltip,
         hideTooltip,
         tooltipData,
@@ -101,13 +133,16 @@ const Xrp = withTooltip(
 
         const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
         const [initialDatesAndPrices, setInitialDatesAndPrices] = useState({ state: 'loading' });
-        const [stock, setStock] = useState([]);
+        const [realStock, setRealStock] = useState([]);
+        const [predStock, setPredStock] = useState([]);
         useEffect(() => {
-            fetch("http://ec2-44-196-240-247.compute-1.amazonaws.com:8181/api/xrp/30")
+            fetch("http://ec2-44-196-240-247.compute-1.amazonaws.com:8181/api/xrp")
                 .then((response) => {
                     response.json().then((json: array) =>
-                        /* CR-someday hlian: You can always slice here if you want */
-                        setStock(json)
+                        /* CR-someday hlian: You can always slice here if you want */ {
+                        setRealStock(json.real_data);
+                        setPredStock(json.pred_data);
+                    }
                     )
                 }).then((data) => {
                     setInitialDatesAndPrices({ state: 'loaded', data })
@@ -120,10 +155,10 @@ const Xrp = withTooltip(
             () => {
                 return scaleTime({
                     range: [margin.left, innerWidth + margin.left],
-                    domain: extent(stock, getDate),
+                    domain: extent(predStock, getDate),
                 });
             },
-            [innerWidth, margin.left, stock],
+            [innerWidth, margin.left, realStock],
         );
 
 
@@ -134,23 +169,50 @@ const Xrp = withTooltip(
                     domain: [0, 1],
                     nice: true,
                 }),
-            [margin.top, innerHeight, stock],
+            [margin.top, innerHeight, realStock],
         );
+
+
+        // const setBoundaries = (dataType) => {
+        //     return boundaries({
+        //         index: bisectDate(dataType, x0, 1),
+        //         d0: dataType[index - 1],
+        //         d1: dataType[index],
+        //     });
+
+        // };
+
+        // const setPredBoundaries = ()=> {
+        //     return boundaries ( {
+        //     index : bisectDate(predStock, x0, 1),
+        //     d0 : predStock[index - 1],
+        //     d1 : predStock[index],
+        //     });
+
+        // };
+
 
         const handleTooltip = useCallback(
             (event: React.TouchEvent<SVGRectElement> | React.MouseEvent<SVGRectElement>) => {
                 const { x } = localPoint(event) || { x: 0 };
                 const x0 = dateScale.invert(x);
                 if (!isNaN(x0)) {
-                    const index = bisectDate(stock, x0, 1);
-                    const d0 = stock[index - 1];
-                    const d1 = stock[index];
+                    const index = bisectDate(realStock, x0, 1);
+                    const d0 = realStock[index - 1];
+                    const d1 = realStock[index];
                     let d = d0;
                     if (d1 && getDate(d1)) {
                         d = x0.valueOf() - getDate(d0).valueOf() > getDate(d1).valueOf() - x0.valueOf() ? d1 : d0;
                     }
+                    const findex = bisectDate(predStock, x0, 1);
+                    const f0 = predStock[findex - 1];
+                    const f1 = predStock[findex];
+                    let f = f0;
+                    if (f1 && getDate(f1)) {
+                        f = x0.valueOf() - getDate(f0).valueOf() > getDate(f1).valueOf() - x0.valueOf() ? f1 : f0;
+                    }
                     showTooltip({
-                        tooltipData: d,
+                        tooltipData: [d, f],
                         tooltipLeft: x,
                         tooltipTop: stockValueScale(getStockValue(d)),
                     });
@@ -176,14 +238,7 @@ const Xrp = withTooltip(
         }, []);
 
         return (
-            <div style={{
-                background: 'linear-gradient(to bottom, white, gray)',
-                height: '100vh',
-            }}>
-                <Header />
-
-
-
+            <div>
                 <div style={{ display: 'flex', justifyContent: 'center', width: "100%", position: "relative" }}> <div>
                     <svg width={1000} height={600} style={{
 
@@ -200,6 +255,8 @@ const Xrp = withTooltip(
                         />
                         <LinearGradient id="area-background-gradient" from={background} to={background2} />
                         <LinearGradient id="area-gradient" from={accentColor} to={accentColor} toOpacity={0.1} />
+                        <LinearGradient id="stroke-gradient" from="#fc3003" to="#fc3003" toOpacity={0.1} />
+                        <LinearGradient id="new-area-gradient" from="#f8f9fa" fromOpacity={0.0} to="#f8f9fa" toOpacity={0.0} />
                         <GridRows
                             left={margin.left}
                             scale={stockValueScale}
@@ -219,13 +276,23 @@ const Xrp = withTooltip(
                             pointerEvents="none"
                         />
                         <AreaClosed
-                            data={stock}
+                            data={realStock}
                             x={(d) => dateScale(getDate(d)) ?? 0}
                             y={(d) => stockValueScale(getStockValue(d)) ?? 0}
                             yScale={stockValueScale}
                             strokeWidth={1}
                             stroke="url(#area-gradient)"
                             fill="url(#area-gradient)"
+                            curve={curveMonotoneX}
+                        />
+                        <AreaClosed
+                            data={predStock}
+                            x={(d) => dateScale(getDate(d)) ?? 0}
+                            y={(d) => stockValueScale(getStockValue(d)) ?? 0}
+                            yScale={stockValueScale}
+                            strokeWidth={1}
+                            stroke="url(#stroke-gradient)"
+                            fill="url(#new-area-gradient)"
                             curve={curveMonotoneX}
                         />
                         <Bar
@@ -281,12 +348,21 @@ const Xrp = withTooltip(
                                 <div>
                                     <TooltipWithBounds
                                         key={Math.random()}
-                                        top={tooltipTop - 12}
+                                        top={tooltipTop + 20}
                                         left={mousePosition.x}
                                         style={tooltipStyles}
                                     >
-                                        {`$${getStockValue(tooltipData)}`}
+                                        {`$${getStockValue(tooltipData[0])}`}
                                     </TooltipWithBounds>
+                                    <TooltipWithBounds
+                                        key={Math.random()}
+                                        top={tooltipTop - 30}
+                                        left={mousePosition.x}
+                                        style={predtooltipStyles}
+                                    >
+                                        {`$${getStockValue(tooltipData[1])}`}
+                                    </TooltipWithBounds>
+
                                     <Tooltip
                                         top={innerHeight + margin.top - 14}
                                         left={mousePosition.x}
@@ -297,7 +373,20 @@ const Xrp = withTooltip(
                                             transform: 'translateX(-50%)',
                                         }}
                                     >
-                                        {formatDate(getDate(tooltipData))}
+                                        {formatDate(getDate(tooltipData[0]))}
+                                    </Tooltip>
+                                    <Tooltip
+                                        top={innerHeight + margin.top + 14}
+                                        left={mousePosition.x}
+                                        style={{
+                                            ...defaultStyles,
+                                            minWidth: 72,
+                                            textAlign: 'center',
+                                            transform: 'translateX(-50%)',
+                                            color: 'red'
+                                        }}
+                                    >
+                                        {formatDate(getDate(tooltipData[1]))}
                                     </Tooltip>
                                 </div>
                             )

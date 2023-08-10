@@ -116,7 +116,7 @@ export async function loader({ params }) {
     return params.window;
 }
 
-const ethereum = withTooltip(
+const Ethereum = withTooltip(
     ({
         width,
         height,
@@ -239,10 +239,6 @@ const ethereum = withTooltip(
 
         return (
             <div>
-                <Header />
-
-
-
                 <div style={{ display: 'flex', justifyContent: 'center', width: "100%", position: "relative" }}> <div>
                     <svg width={1000} height={600} style={{
 
@@ -421,4 +417,4 @@ export const ethereumLoader = async ({ params }) => {
     return { ethereumWindow: params.window }
 }
 
-export default ethereum;
+export default Ethereum;
