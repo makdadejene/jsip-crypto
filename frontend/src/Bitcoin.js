@@ -141,9 +141,10 @@ const Bitcoin = withTooltip(
             fetch("http://ec2-44-196-240-247.compute-1.amazonaws.com:8181/api/bitcoin/30")
                 .then((response) => {
                     response.json().then((json: array) =>
-                        /* CR-someday hlian: You can always slice here if you want */
-                        {setRealStock(json.real_data);
-                        setPredStock(json.pred_data);}
+                        /* CR-someday hlian: You can always slice here if you want */ {
+                        setRealStock(json.real_data);
+                        setPredStock(json.pred_data);
+                    }
                     )
                 }).then((data) => {
                     setInitialDatesAndPrices({ state: 'loaded', data })
@@ -156,7 +157,7 @@ const Bitcoin = withTooltip(
             () => {
                 return scaleTime({
                     range: [margin.left, innerWidth + margin.left],
-                    domain: extent(realStock, getDate),
+                    domain: extent(predStock, getDate),
                 });
             },
             [innerWidth, margin.left, realStock],
@@ -167,7 +168,7 @@ const Bitcoin = withTooltip(
             () =>
                 scaleLinear({
                     range: [innerHeight + margin.top, margin.top],
-                    domain: [0, (max(realStock, getStockValue) || 0) + innerHeight / 3],
+                    domain: [0, (max(predStock, getStockValue) || 0) + innerHeight / 3],
                     nice: true,
                 }),
             [margin.top, innerHeight, realStock],
@@ -233,6 +234,8 @@ const Bitcoin = withTooltip(
                         />
                         <LinearGradient id="area-background-gradient" from={background} to={background2} />
                         <LinearGradient id="area-gradient" from={accentColor} to={accentColor} toOpacity={0.1} />
+                        <LinearGradient id="stroke-gradient" from="#fc3003" to="#fc3003" toOpacity={0.1} />
+                        <LinearGradient id="new-area-gradient" from="#f8f9fa" fromOpacity= {0.0} to="#f8f9fa" toOpacity={0.0} />
                         <GridRows
                             left={margin.left}
                             scale={stockValueScale}
@@ -267,8 +270,8 @@ const Bitcoin = withTooltip(
                             y={(d) => stockValueScale(getStockValue(d)) ?? 0}
                             yScale={stockValueScale}
                             strokeWidth={1}
-                            stroke="url(#area-gradient)"
-                            fill="url(#area-gradient)"
+                            stroke="url(#stroke-gradient)"
+                            fill="url(#new-area-gradient)"
                             curve={curveMonotoneX}
                         />
                         <Bar
@@ -330,6 +333,7 @@ const Bitcoin = withTooltip(
                                     >
                                         {`$${getStockValue(tooltipData)}`}
                                     </TooltipWithBounds>
+                            
                                     <Tooltip
                                         top={innerHeight + margin.top - 14}
                                         left={mousePosition.x}
