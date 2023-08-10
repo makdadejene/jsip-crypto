@@ -13,6 +13,7 @@ let init crypto_table =
 ;;
 
 let get_coin_data crypto_table coin =
+  print_endline coin;
   let coin =
     match coin with
     | "bitcoin" -> Crypto.Bitcoin

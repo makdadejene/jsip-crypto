@@ -7,6 +7,7 @@ import Solana, { solanaLoader } from "./Solana";
 import Header from "./Header";
 import Home from "./Home";
 import NoPage from "./NoPage";
+import HomeHelper from "./HomeHelper";
 
 import ReactDOM from 'react-dom';
 import { Outlet } from 'react-router-dom';
@@ -14,14 +15,13 @@ import { Outlet } from 'react-router-dom';
 import { BrowserRouter, Routes, Route, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
 // import { ethereumLoader } from "./Ethereum";
 
-const Index = () => 
-<h1>Welcome to Crypto-Pricer</h1>;
+
 
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/" element={<Home />}>
-            <Route index element={<Index />} />
+            <Route index element={<HomeHelper />} />
             <Route path="bitcoin" loader={bitcoinLoader} element={<Bitcoin />} />
             <Route path="ethereum" loader={ethereumLoader} element={<Ethereum />} />
             <Route path="xrp" loader={xrpLoader} element={<Xrp />} />

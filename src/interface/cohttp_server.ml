@@ -22,6 +22,7 @@ let crypto_table = Hashtbl.create (module Crypto)
 let handler ~body:_ _sock req =
   let uri = Cohttp.Request.uri req in
   let request = Uri.path uri |> String.split ~on:'/' in
+  List.iter request ~f:print_endline;
   match request with
   | [ _; "api"; coin ] ->
     let response =
