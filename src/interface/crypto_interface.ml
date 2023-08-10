@@ -33,6 +33,9 @@ let predict_all_prices crypto_table coin ?(window_size = "30") () =
     | "bitcoin" -> Crypto.Bitcoin
     | "ethereum" -> Crypto.Ethereum
     | "xrp" -> Crypto.XRP
+    | "bnb" -> Crypto.BNB
+    | "cardano" -> Crypto.Cardano
+    | "solana" -> Crypto.Solana
     | _ -> failwith "That is not a valid coin"
   in
   let window_size = int_of_string window_size in
