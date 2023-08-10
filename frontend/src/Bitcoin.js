@@ -28,6 +28,15 @@ import Legend from "./Legend";
 import { getConfig } from '@testing-library/react';
 
 
+// import Ethereum from "./Ethereum";
+// import XRP from ".Xrp";
+
+// let getCoin = {
+//     date : 
+//     prices :
+// }
+
+
 type total_data = {
     real: data;
     pred: data;
@@ -404,12 +413,6 @@ const Bitcoin = withTooltip(
 
 
                 </div >
-
-                {/* {tooltipData && (
-                    <Box display="flex" justifyContent="center" mt={2}>
-                        <Input type="text" placeholder="Enter text here" />
-                    </Box>
-                )} */}
 
             </div>
         );

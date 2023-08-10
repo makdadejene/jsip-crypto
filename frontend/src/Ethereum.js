@@ -239,7 +239,6 @@ const ethereum = withTooltip(
 
         return (
             <div>
-                <Header />
 
 
 

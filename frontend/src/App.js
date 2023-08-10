@@ -14,7 +14,8 @@ import { Outlet } from 'react-router-dom';
 import { BrowserRouter, Routes, Route, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
 // import { ethereumLoader } from "./Ethereum";
 
-const Index = () => <h1>Hello World</h1>;
+const Index = () => 
+<h1>Welcome to Crypto-Pricer</h1>;
 
 
 export const router = createBrowserRouter(
