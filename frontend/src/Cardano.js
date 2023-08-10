@@ -166,7 +166,7 @@ const Cardano = withTooltip(
             () =>
                 scaleLinear({
                     range: [innerHeight + margin.top, margin.top],
-                    domain: [0, (max(predStock, getStockValue) || 0) + innerHeight / 3],
+                    domain: [0, 0.7],
                     nice: true,
                 }),
             [margin.top, innerHeight, realStock],

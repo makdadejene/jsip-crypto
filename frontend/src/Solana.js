@@ -39,12 +39,12 @@ type data = {
 }
 
 // const stock = appleStock.slice(800);
-export const background = '#212529';
-export const background2 = '#204051';
+export const background = '#e0c3fc';
+export const background2 = '#bbadff';
 // export const accentColor = '#edede9';
 // export const accentColorDark = '#6c757d';
-export const accentColor = '#edede9';
-export const accentColorDark = '#6c757d';
+export const accentColor = '#3c096c';
+export const accentColorDark = '#240046';
 const tooltipStyles = {
     ...defaultStyles,
     background,
@@ -166,7 +166,7 @@ const Solana = withTooltip(
             () =>
                 scaleLinear({
                     range: [innerHeight + margin.top, margin.top],
-                    domain: [0, (max(predStock, getStockValue) || 0) + innerHeight / 3],
+                    domain: [0, 60],
                     nice: true,
                 }),
             [margin.top, innerHeight, realStock],
