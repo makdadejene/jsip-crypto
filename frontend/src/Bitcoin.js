@@ -28,15 +28,6 @@ import Legend from "./Legend";
 import { getConfig } from '@testing-library/react';
 
 
-// import Ethereum from "./Ethereum";
-// import XRP from ".Xrp";
-
-// let getCoin = {
-//     date : 
-//     prices :
-// }
-
-
 type total_data = {
     real: data;
     pred: data;

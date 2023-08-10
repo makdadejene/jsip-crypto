@@ -28,14 +28,10 @@ import Legend from "./Legend";
 import { getConfig } from '@testing-library/react';
 
 
-// import Ethereum from "./Ethereum";
-// import XRP from ".Xrp";
-
-// let getCoin = {
-//     date : 
-//     prices :
-// }
-
+type total_data = {
+    real: data;
+    pred: data;
+}
 
 type data = {
     date: string;
@@ -43,16 +39,25 @@ type data = {
 }
 
 // const stock = appleStock.slice(800);
-export const background = '#3b6978';
+export const background = '#212529';
 export const background2 = '#204051';
-export const accentColor = '#edffea';
-export const accentColorDark = '#75daad';
+// export const accentColor = '#edede9';
+// export const accentColorDark = '#6c757d';
+export const accentColor = '#edede9';
+export const accentColorDark = '#6c757d';
 const tooltipStyles = {
     ...defaultStyles,
     background,
     border: '1px solid white',
     color: 'white',
 };
+
+const predtooltipStyles = {
+    ...defaultStyles,
+    background,
+    border: '1px solid red',
+    color: 'red',
+}
 
 // util
 const formatDate = timeFormat("%b %d, '%y");
@@ -64,12 +69,39 @@ const parseDate = (input: string) => {
     if (date instanceof Date && !isNaN(date)) return date;
     else throw new Error(`invalid date ${input}`);
 }
+
+// const getRealDate = (d: total_data.real) => {
+//     return parseDate(d.date)
+// }
+
+// const getRealPrice = (d: total_data.real) => {
+//     if (d === undefined) debugger;
+//     return d.price;
+// }
+
+// const getPredDate = (d: total_data.pred) => {
+//     return parseDate(d.date)
+// }
+
+// const getPredPrice = (d: total_data.pred) => {
+//     if (d === undefined) debugger;
+//     return d.price;
+// }
+
 const getDate = (d: data) => {
     return parseDate(d.date)
 }
 const getStockValue = (d: data) => {
     if (d === undefined) debugger;
     return d.price;
+}
+
+const getRealData = (d: total_data) => {
+    return d.real;
+}
+
+const getPredData = (d: total_data) => {
+    return d.pred;
 }
 const bisectDate = bisector((d) => parseDate(d.date)).left;
 
@@ -84,7 +116,7 @@ export async function loader({ params }) {
     return params.window;
 }
 
-const Ethereum = withTooltip(
+const ethereum = withTooltip(
     ({
         width,
         height,
@@ -104,7 +136,7 @@ const Ethereum = withTooltip(
         const [realStock, setRealStock] = useState([]);
         const [predStock, setPredStock] = useState([]);
         useEffect(() => {
-            fetch("http://ec2-44-196-240-247.compute-1.amazonaws.com:8181/api/bitcoin")
+            fetch("http://ec2-44-196-240-247.compute-1.amazonaws.com:8181/api/ethereum")
                 .then((response) => {
                     response.json().then((json: array) =>
                         /* CR-someday hlian: You can always slice here if you want */ {
@@ -389,4 +421,4 @@ export const ethereumLoader = async ({ params }) => {
     return { ethereumWindow: params.window }
 }
 
-export default Ethereum;
+export default ethereum;
