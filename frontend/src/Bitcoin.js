@@ -138,7 +138,7 @@ const Bitcoin = withTooltip(
         const [realStock, setRealStock] = useState([]);
         const [predStock, setPredStock] = useState([]);
         useEffect(() => {
-            fetch("http://ec2-44-196-240-247.compute-1.amazonaws.com:8181/api/bitcoin/30")
+            fetch("http://ec2-44-196-240-247.compute-1.amazonaws.com:8181/api/bitcoin")
                 .then((response) => {
                     response.json().then((json: array) =>
                         /* CR-someday hlian: You can always slice here if you want */ {

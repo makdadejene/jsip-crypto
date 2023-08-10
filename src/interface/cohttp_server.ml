@@ -23,9 +23,9 @@ let handler ~body:_ _sock req =
   let uri = Cohttp.Request.uri req in
   let request = Uri.path uri |> String.split ~on:'/' in
   match request with
-  | [ _; "api"; coin; window ] ->
+  | [ _; "api"; coin ] ->
     let response =
-      Crypto_interface.predict_all_prices crypto_table coin window
+      Crypto_interface.predict_all_prices crypto_table coin ()
     in
     let second_response = Crypto_interface.get_coin_data crypto_table coin in
     let pred_data =
@@ -39,42 +39,6 @@ let handler ~body:_ _sock req =
     in
     Server.respond_string json_response
   | _ -> Server.respond_string ~status:`Not_found "Route not found"
-;;
-
-let handle url =
-  let crypto_table = Hashtbl.create (module Crypto) in
-  Crypto_interface.init crypto_table;
-  let request = url |> String.split ~on:'/' in
-  print_s [%message (request : string list)];
-  match request with
-  | [ _; coin; window ] ->
-    let response =
-      Crypto_interface.predict_all_prices crypto_table coin window
-    in
-    let dates, prices =
-      ( Array.map response ~f:(fun data_tuple ->
-          Jsonaf.of_string (fst data_tuple) |> Jsonaf.jsonaf_of_t)
-      , Array.map response ~f:(fun data_tuple ->
-          Jsonaf.of_string (Float.to_string (snd data_tuple))
-          |> Jsonaf.jsonaf_of_t) )
-    in
-    let dates = `Array (dates |> Array.to_list) in
-    let prices = `Array (prices |> Array.to_list) in
-    let response =
-      `Array [ dates; prices ] |> Jsonaf.jsonaf_of_t |> Jsonaf.to_string
-    in
-    print_s [%message (response : string)];
-    response
-  | _ -> "Server.respond_string ~status:`Not_found"
-;;
-
-let%expect_test "check_response" =
-  let url_response =
-    handle
-      "http://ec2-44-196-240-247.compute-1.amazonaws.com:8181/bitcoin/30"
-  in
-  print_s [%message (url_response : string)];
-  [%expect {|(url_response((1,2,3|}]
 ;;
 
 let start_server port () =

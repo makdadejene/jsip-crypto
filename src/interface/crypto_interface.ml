@@ -27,7 +27,7 @@ let get_coin_data crypto_table coin =
   Simple_model.ArimaModel.data_graph_points model
 ;;
 
-let predict_all_prices crypto_table coin window_size =
+let predict_all_prices crypto_table coin ?(window_size = "30") () =
   let coin =
     match coin with
     | "bitcoin" -> Crypto.Bitcoin
