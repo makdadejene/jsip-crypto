@@ -182,25 +182,6 @@ const Bitcoin = withTooltip(
         );
 
 
-        // const setBoundaries = (dataType) => {
-        //     return boundaries({
-        //         index: bisectDate(dataType, x0, 1),
-        //         d0: dataType[index - 1],
-        //         d1: dataType[index],
-        //     });
-
-        // };
-
-        // const setPredBoundaries = ()=> {
-        //     return boundaries ( {
-        //     index : bisectDate(predStock, x0, 1),
-        //     d0 : predStock[index - 1],
-        //     d1 : predStock[index],
-        //     });
-
-        // };
-
-
         const handleTooltip = useCallback(
             (event: React.TouchEvent<SVGRectElement> | React.MouseEvent<SVGRectElement>) => {
                 const { x } = localPoint(event) || { x: 0 };
