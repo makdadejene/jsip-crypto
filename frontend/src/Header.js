@@ -17,8 +17,9 @@ const Header = () => {
                     <Button color="inherit" sx={{ fontSize: '20px', fontFamily: 'Georgia, serif', m: 3, mt: 4 }} >
                         <Link to="/ethereum" style={{ textDecoration: 'none', color: 'white' }}> Ethereum</Link>
                     </Button>
+
                     <Button color="inherit" sx={{ fontSize: '20px', fontFamily: 'Georgia, serif', m: 3, mt: 4 }} >
-                        <Link to="/xrp" style={{ textDecoration: 'none', color: 'white' }}> Xrp</Link>
+                        <Link to="/" style={{ textDecoration: 'none', color: 'white' }}> Xrp</Link>
                     </Button>
                     <Button color="inherit" sx={{ fontSize: '20px', fontFamily: 'Georgia, serif', m: 3, mt: 4 }} >
                         <Link to="/bnb" style={{ textDecoration: 'none', color: 'white' }}> Bnb</Link>
