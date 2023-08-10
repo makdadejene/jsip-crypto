@@ -1,9 +1,9 @@
 import Bitcoin, { bitcoinLoader } from "./Bitcoin";
 import Ethereum, { ethereumLoader } from "./Ethereum";
 import Xrp, { xrpLoader } from "./Xrp";
-import Bnb, { bnbLoader } from "./Bitcoin";
-import Cardano, { cardanoLoader } from "./Ethereum";
-import Solana, { solanaLoader } from "./Xrp";
+import Bnb, { bnbLoader } from "./Bnb";
+import Cardano, { cardanoLoader } from "./Cardano";
+import Solana, { solanaLoader } from "./Solana";
 import Header from "./Header";
 import Home from "./Home";
 import NoPage from "./NoPage";
