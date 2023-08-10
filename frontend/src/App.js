@@ -18,12 +18,12 @@ import { BrowserRouter, Routes, Route, createBrowserRouter, createRoutesFromElem
 export const router = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/" element={<Home />}>
-            <Route path="bitcoin/:window" loader={bitcoinLoader} element={<Bitcoin />} />
-            <Route path="ethereum/:window" loader={ethereumLoader} element={<Ethereum />} />
-            <Route path="xrp/:window" loader={xrpLoader} element={<Xrp />} />
-            <Route path="bnb/:window" loader={bnbLoader} element={<Bnb />} />
-            <Route path="cardano/:window" loader={cardanoLoader} element={<Cardano />} />
-            <Route path="solana/:window" loader={solanaLoader} element={<Solana />} />
+            <Route path="bitcoin" loader={bitcoinLoader} element={<Bitcoin />} />
+            <Route path="ethereum" loader={ethereumLoader} element={<Ethereum />} />
+            <Route path="xrp" loader={xrpLoader} element={<Xrp />} />
+            <Route path="bnb" loader={bnbLoader} element={<Bnb />} />
+            <Route path="cardano" loader={cardanoLoader} element={<Cardano />} />
+            <Route path="solana" loader={solanaLoader} element={<Solana />} />
             <Route path="*" element={<NoPage />} />
         </Route>
     )

@@ -30,15 +30,6 @@ const Header = () => {
                     <Button color="inherit" sx={{ fontSize: '20px', fontFamily: 'Georgia, serif', m: 3, mt: 4 }} >
                         <Link to="/solana" style={{ textDecoration: 'none', color: 'white' }}> Solana</Link>
                     </Button>
-                    <Button color="inherit" sx={{ fontSize: '20px', fontFamily: 'Georgia, serif', m: 3, mt: 4 }} >
-                        <Link to="/bnb" style={{ textDecoration: 'none', color: 'white' }}> Bnb</Link>
-                    </Button>
-                    <Button color="inherit" sx={{ fontSize: '20px', fontFamily: 'Georgia, serif', m: 3, mt: 4 }} >
-                        <Link to="/cardano" style={{ textDecoration: 'none', color: 'white' }}> Cardano</Link>
-                    </Button>
-                    <Button color="inherit" sx={{ fontSize: '20px', fontFamily: 'Georgia, serif', m: 3, mt: 4 }} >
-                        <Link to="/solana" style={{ textDecoration: 'none', color: 'white' }}> Solana</Link>
-                    </Button>
                 </Toolbar>
             </AppBar >
         </div >
