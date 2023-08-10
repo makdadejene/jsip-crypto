@@ -11,17 +11,10 @@ import { Outlet } from 'react-router-dom';
 import { BrowserRouter, Routes, Route, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
 // import { ethereumLoader } from "./Ethereum";
 
-const Root = () => {
-    return (
-        <div>
-            <Outlet />
-        </div>
-    )
-}
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
-        <Route path="/" element={<Root />}>
+        <Route path="/" element={<Home />}>
             <Route path="bitcoin/:window" loader={bitcoinLoader} element={<Bitcoin />} />
             <Route path="ethereum/:window" loader={ethereumLoader} element={<Ethereum />} />
             <Route path="xrp/:window" loader={xrpLoader} element={<Xrp />} />
