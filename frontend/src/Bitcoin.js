@@ -248,7 +248,6 @@ const Bitcoin = withTooltip(
 
         return (
             <div>
-                <Header />
 
 
 
