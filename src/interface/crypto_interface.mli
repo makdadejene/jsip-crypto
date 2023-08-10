@@ -15,5 +15,6 @@ val get_coin_data
 val predict_all_prices
   :  (Crypto.t, ArimaModel.t) Base.Hashtbl.t
   -> string
-  -> string
+  -> ?window_size:string
+  -> unit
   -> (string * float) array
