@@ -1,6 +1,6 @@
 import React from 'react';
 import { Container, Typography, CssBaseline } from '@mui/material';
-import backgroundImage from '/usr/local/home/jsipuser/jsipcrypto/frontend/src/desktop-wallpaper-solid-navy-blue-backgrounds-becuo-2120x1192-for-your-mobile-tablet-plain-blue-aesthetic.jpg';
+import backgroundImage from '/usr/local/home/jsipuser/jsipcrypto/frontend/src/shutterstock_1203609688.jpg';
 
 const containerStyle = {
   backgroundImage: `url(${backgroundImage})`,

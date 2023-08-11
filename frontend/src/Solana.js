@@ -38,13 +38,12 @@ type data = {
     price: number;
 }
 
-// const stock = appleStock.slice(800);
-export const background = '#e0c3fc';
-export const background2 = '#bbadff';
-// export const accentColor = '#edede9';
-// export const accentColorDark = '#6c757d';
-export const accentColor = '#3c096c';
-export const accentColorDark = '#240046';
+
+export const background = '#580c1f';
+export const background2 = '#f9b5ac';
+
+export const accentColor = '#edede9';
+export const accentColorDark = '#6c757d';
 const tooltipStyles = {
     ...defaultStyles,
     background,
@@ -70,23 +69,7 @@ const parseDate = (input: string) => {
     else throw new Error(`invalid date ${input}`);
 }
 
-// const getRealDate = (d: total_data.real) => {
-//     return parseDate(d.date)
-// }
 
-// const getRealPrice = (d: total_data.real) => {
-//     if (d === undefined) debugger;
-//     return d.price;
-// }
-
-// const getPredDate = (d: total_data.pred) => {
-//     return parseDate(d.date)
-// }
-
-// const getPredPrice = (d: total_data.pred) => {
-//     if (d === undefined) debugger;
-//     return d.price;
-// }
 
 const getDate = (d: data) => {
     return parseDate(d.date)
@@ -171,25 +154,6 @@ const Solana = withTooltip(
                 }),
             [margin.top, innerHeight, realStock],
         );
-
-
-        // const setBoundaries = (dataType) => {
-        //     return boundaries({
-        //         index: bisectDate(dataType, x0, 1),
-        //         d0: dataType[index - 1],
-        //         d1: dataType[index],
-        //     });
-
-        // };
-
-        // const setPredBoundaries = ()=> {
-        //     return boundaries ( {
-        //     index : bisectDate(predStock, x0, 1),
-        //     d0 : predStock[index - 1],
-        //     d1 : predStock[index],
-        //     });
-
-        // };
 
 
         const handleTooltip = useCallback(
@@ -390,11 +354,6 @@ const Solana = withTooltip(
 
                 </div >
 
-                {/* {tooltipData && (
-                    <Box display="flex" justifyContent="center" mt={2}>
-                        <Input type="text" placeholder="Enter text here" />
-                    </Box>
-                )} */}
 
             </div>
         );
