@@ -328,6 +328,15 @@ module Total_Data = struct
         let days = List.rev (List.take (List.rev (days t)) num_of_days) in
         { crypto = crypto t; days })
     ;;
+
+    let get_date_price t date =
+      match
+        List.find (days t) ~f:(fun day_data ->
+          Date.equal (Day_Data.get_date day_data) date)
+      with
+      | Some day_data -> Some (Day_Data.get_close day_data)
+      | None -> None
+    ;;
   end
 
   include T
