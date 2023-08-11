@@ -375,19 +375,7 @@ const Xrp = withTooltip(
                                     >
                                         {formatDate(getDate(tooltipData[0]))}
                                     </Tooltip>
-                                    <Tooltip
-                                        top={innerHeight + margin.top + 14}
-                                        left={mousePosition.x}
-                                        style={{
-                                            ...defaultStyles,
-                                            minWidth: 72,
-                                            textAlign: 'center',
-                                            transform: 'translateX(-50%)',
-                                            color: 'red'
-                                        }}
-                                    >
-                                        {formatDate(getDate(tooltipData[1]))}
-                                    </Tooltip>
+                 
                                 </div>
                             )
 
