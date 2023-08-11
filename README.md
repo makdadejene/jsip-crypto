@@ -1,5 +1,5 @@
 ---
-title: JSIP Crypto-Currency Project
+JSIP Crypto-Currency Project
 ---
 This is our final project for the Jane Street Immersion Program. We created a crypto-currency prediction model that is displayed on React powered website.
 
