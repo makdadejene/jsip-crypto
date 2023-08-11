@@ -24,6 +24,7 @@ module ArimaModel : sig
     -> t
 
   val update_dateset : 'a -> 'b -> 'a * 'b
+  val prediction_rmse : t -> float
   val predict_next_price : t -> Prediction.t
   val predict_all_prices : t -> int -> unit
   val data_graph_points : t -> (string * float) array

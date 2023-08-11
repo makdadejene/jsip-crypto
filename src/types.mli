@@ -131,6 +131,7 @@ module Total_Data : sig
   val get_last_day : t -> Day_Data.t
   val next_day_date : t -> Date.t
   val last_n_days_dataset : t -> num_of_days:int -> t
+  val get_date_price : t -> Date.t -> float option
 end
 
 module Prediction : sig

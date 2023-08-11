@@ -93,6 +93,27 @@ module ArimaModel = struct
     t.predictions <- predictions
   ;;
 
+  let prediction_rmse t =
+    let n = ref 0 in
+    let total_squared_error =
+      Array.fold (predictions t) ~init:0. ~f:(fun acc prediction ->
+        match
+          Total_Data.get_date_price
+            (full_dataset t)
+            (Prediction.date prediction)
+        with
+        | Some price ->
+          n := !n + 1;
+          acc
+          +. ((Prediction.prediction prediction -. price)
+              *. (Prediction.prediction prediction -. price))
+        | None -> 0.)
+    in
+    if not (!n = 0)
+    then Float.sqrt total_squared_error /. float_of_int !n
+    else failwith "None of the predictions aligned with any dates"
+  ;;
+
   let data_graph_points t =
     List.to_array
       (List.map
