@@ -39,8 +39,8 @@ type data = {
 }
 
 
-export const background = '#7251b5';
-export const background2 = '#9163cb';
+export const background = '#3f3649';
+export const background2 = '#7151a9';
 
 export const accentColor = '#edede9';
 export const accentColorDark = '#6c757d';
@@ -54,10 +54,9 @@ const tooltipStyles = {
 const predtooltipStyles = {
     ...defaultStyles,
     background,
-    border: '1px solid red',
+    border: '1px solid white',
     color: 'red',
 }
-
 // util
 const formatDate = timeFormat("%b %d, '%y");
 

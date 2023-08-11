@@ -39,7 +39,7 @@ type data = {
 }
 
 
-export const background = '#344e41';
+export const background = '#081c15';
 export const background2 = '#97a97c';
 export const accentColor = '#edede9';
 export const accentColorDark = '#6c757d';
@@ -53,7 +53,7 @@ const tooltipStyles = {
 const predtooltipStyles = {
     ...defaultStyles,
     background,
-    border: '1px solid red',
+    border: '1px solid white',
     color: 'red',
 }
 

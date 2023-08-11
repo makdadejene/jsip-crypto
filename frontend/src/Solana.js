@@ -38,9 +38,9 @@ type data = {
     price: number;
 }
 
+export const background = '#252627';
+export const background2 = '#cfd2cd';
 
-export const background = '#580c1f';
-export const background2 = '#f9b5ac';
 
 export const accentColor = '#edede9';
 export const accentColorDark = '#6c757d';
@@ -54,7 +54,7 @@ const tooltipStyles = {
 const predtooltipStyles = {
     ...defaultStyles,
     background,
-    border: '1px solid red',
+    border: '1px solid white',
     color: 'red',
 }
 

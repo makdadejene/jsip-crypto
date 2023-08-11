@@ -38,8 +38,8 @@ type data = {
     price: number;
 }
 
-export const background = '#805b10';
-export const background2 = '#b69121';
+export const background = '#655560';
+export const background2 = '#a4969b';
 
 export const accentColor = '#edede9';
 export const accentColorDark = '#6c757d';
@@ -53,7 +53,7 @@ const tooltipStyles = {
 const predtooltipStyles = {
     ...defaultStyles,
     background,
-    border: '1px solid red',
+    border: '1px solid white',
     color: 'red',
 }
 
