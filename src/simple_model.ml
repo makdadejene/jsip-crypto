@@ -107,7 +107,7 @@ module ArimaModel = struct
           acc
           +. ((Prediction.prediction prediction -. price)
               *. (Prediction.prediction prediction -. price))
-        | None -> 0.)
+        | None -> acc)
     in
     if not (!n = 0)
     then Float.sqrt total_squared_error /. float_of_int !n

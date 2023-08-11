@@ -42,6 +42,8 @@ let predict_all_prices crypto_table coin ?(window_size = "30") () =
   let window_size = int_of_string window_size in
   let model = Hashtbl.find_exn crypto_table coin in
   Simple_model.ArimaModel.predict_all_prices model window_size;
+  let rmse = Simple_model.ArimaModel.prediction_rmse model in
+  print_s [%message (rmse : float)];
   Simple_model.ArimaModel.predictions_graph_points model
 ;;
 
