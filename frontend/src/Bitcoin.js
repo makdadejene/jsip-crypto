@@ -28,15 +28,6 @@ import Legend from "./Legend";
 import { getConfig } from '@testing-library/react';
 
 
-// import Ethereum from "./Ethereum";
-// import XRP from ".Xrp";
-
-// let getCoin = {
-//     date : 
-//     prices :
-// }
-
-
 type total_data = {
     real: data;
     pred: data;
@@ -47,11 +38,9 @@ type data = {
     price: number;
 }
 
-// const stock = appleStock.slice(800);
-export const background = '#212529';
-export const background2 = '#204051';
-// export const accentColor = '#edede9';
-// export const accentColorDark = '#6c757d';
+
+export const background = '#0d1b2a';
+export const background2 = '#778da9';
 export const accentColor = '#edede9';
 export const accentColorDark = '#6c757d';
 const tooltipStyles = {
@@ -79,23 +68,7 @@ const parseDate = (input: string) => {
     else throw new Error(`invalid date ${input}`);
 }
 
-// const getRealDate = (d: total_data.real) => {
-//     return parseDate(d.date)
-// }
 
-// const getRealPrice = (d: total_data.real) => {
-//     if (d === undefined) debugger;
-//     return d.price;
-// }
-
-// const getPredDate = (d: total_data.pred) => {
-//     return parseDate(d.date)
-// }
-
-// const getPredPrice = (d: total_data.pred) => {
-//     if (d === undefined) debugger;
-//     return d.price;
-// }
 
 const getDate = (d: data) => {
     return parseDate(d.date)
