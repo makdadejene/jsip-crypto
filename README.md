@@ -21,7 +21,7 @@ To access the website, start up the backend server through the 'src' folder loca
 
 Then, to view the frontend, $ cd frontend and $ npm run start. Keep in mind that packages such as Material UI and Visx will have to be installed for all of the visuals to appear. These packages can be installed through $ npm install [package name]. 
 
-The code work using your personal AWS Access Key ID, so it is necessary to follow [these](https://docs.aws.amazon.com/powershell/latest/userguide/pstools-appendix-sign-up.html) instructions to get the key. After this, update the fetch requests to be "http://[your key]:8181/api/[coin type]".
+The code works using your personal AWS Access Key ID, so it is necessary to follow [these](https://docs.aws.amazon.com/powershell/latest/userguide/pstools-appendix-sign-up.html) instructions to get the key. After this, update the fetch requests to be "http://[your key]:8181/api/[coin type]".
 
 The link to access the website will be "http://[your key]:8181/[coin type]."
 
@@ -29,7 +29,6 @@ The link to access the website will be "http://[your key]:8181/[coin type]."
 ## Collaborators 
 
 Makda Dejene and Daniel Ige
-
 
 
 
